@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  frontend:
+    container_name: frontend-app
+    build: frontend
+    ports:
+      - "8080:8080"
+    environment:
+      - POSTGRES_HOST=postgres
+    depends_on:
+      - postgres
+      - backend    
+        
+  backend:
+    container_name: backend-app
+    build: backend
+    ports:
+      - "5000:5000"
+    depends_on:
+      - postgres
+
+
+  postgres:
+    container_name: postgre-container
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: microservices_db    
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+
+volumes:
+  postgres_data:
