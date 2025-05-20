@@ -6,8 +6,6 @@ services:
     build: frontend
     ports:
       - "8080:80"
-    environment:
-      - POSTGRES_HOST=postgres
     depends_on:
       - postgres
       - backend    
@@ -25,6 +23,7 @@ services:
     container_name: postgre-container
     image: postgres:15-alpine
     environment:
+      POSTGRES_HOST: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: microservices_db    
     volumes:

@@ -9,6 +9,8 @@ RUN npm run build
 # Production Stage
 FROM nginx:stable-alpine AS production
 
+RUN apk update && apk upgrade --no-cache
+
 COPY --from=build /app/build /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
