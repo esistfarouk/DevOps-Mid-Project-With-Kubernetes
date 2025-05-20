@@ -21,7 +21,9 @@ services:
 
   postgres:
     container_name: postgres-container
-    image: postgres:15-alpine
+    #addind directory with dockerfile to fix image vulnerabilities 
+    build: database
+    #image: postgres:15-alpine
     environment:
       POSTGRES_HOST: postgres
       POSTGRES_PASSWORD: postgres
