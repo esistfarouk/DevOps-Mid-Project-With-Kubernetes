@@ -20,7 +20,7 @@ services:
 
 
   postgres:
-    container_name: postgre-container
+    container_name: postgres-container
     image: postgres:15-alpine
     environment:
       POSTGRES_HOST: postgres
