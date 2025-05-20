@@ -5,7 +5,7 @@ services:
     container_name: frontend-app
     build: frontend
     ports:
-      - "8080:8080"
+      - "8080:80"
     environment:
       - POSTGRES_HOST=postgres
     depends_on:
@@ -27,8 +27,6 @@ services:
     environment:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: microservices_db    
-    ports:
-      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 

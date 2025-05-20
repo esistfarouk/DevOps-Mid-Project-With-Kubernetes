@@ -23,10 +23,7 @@ import {
 import { Delete as DeleteIcon, Edit as EditIcon } from '@mui/icons-material';
 import axios from 'axios';
 
-//const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
-// app.js - Ensure API_URL is properly configured
-const API_URL = process.env.REACT_APP_API_URL || '/api';
-
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
 function App() {
   const [tasks, setTasks] = useState([]);

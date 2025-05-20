@@ -19,6 +19,6 @@ COPY --from=builder /usr/local/lib/python3.10/site-packages/ /usr/local/lib/pyth
 # Copy the application code from the backend-builder stage
 COPY --from=builder /app /app
 
-EXPOSE 5000 5432
+EXPOSE 5000
 
 CMD ["python", "app.py"]

@@ -5,7 +5,7 @@ from flask_migrate import Migrate
 from flask_swagger_ui import get_swaggerui_blueprint
 import os
 from dotenv import load_dotenv
-from sqlalchemy import text  # Add this import at the top
+from sqlalchemy import text
 import datetime
 
 # Load environment variables
@@ -121,11 +121,10 @@ def delete_task(task_id):
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
 
-
 @app.route('/health')
 def health_check():
     try:
-        # Check database connection using text() wrapper
+        # Check database connection
         db.session.execute(text('SELECT 1'))
         return jsonify({
             'status': 'healthy',
@@ -137,18 +136,6 @@ def health_check():
             'status': 'unhealthy',
             'error': str(e)
         }), 500
-
-
-@app.route('/')
-def index():
-    return jsonify({
-        'message': 'Welcome to the Task Manager API',
-        'endpoints': {
-            'tasks': '/api/tasks',
-            'docs': '/api/docs'
-        }
-    })
-
 
 if __name__ == '__main__':
     with app.app_context():
