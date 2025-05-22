@@ -1,0 +1,29 @@
+- name: Rebuild Docker backend image
+  community.docker.docker_image:
+    build:
+      nocache: true
+      path: ~/Desktop/devops/DevOps-Mid-Project/backend
+    name: ahmedmfarouk/backend:v1
+    source: build    
+    state: present
+    force_source: yes
+
+- name: Rebuild Docker frontend image
+  community.docker.docker_image:
+    build:
+      nocache: true
+      path: ~/Desktop/devops/DevOps-Mid-Project/frontend
+    name: ahmedmfarouk/frontend:v1
+    source: build    
+    state: present
+    force_source: yes
+
+- name: Rebuild Docker database image
+  community.docker.docker_image:
+    build:
+      nocache: true
+      path: ~/Desktop/devops/DevOps-Mid-Project/database
+    name: ahmedmfarouk/postgres:v1
+    source: build    
+    state: present
+    force_source: yes

@@ -3,7 +3,7 @@ version: '3.8'
 services:
   frontend:
     container_name: frontend-app
-    image: ahmedmfarouk/devops-mid-project:frontend
+    image: ahmedmfarouk/frontend:v1
     ports:
       - "8080:80"
     depends_on:
@@ -12,7 +12,7 @@ services:
         
   backend:
     container_name: backend-app
-    image: ahmedmfarouk/devops-mid-project:backend
+    image: ahmedmfarouk/backend:v1
     ports:
       - "5000:5000"
     depends_on:
@@ -22,7 +22,7 @@ services:
   postgres:
     container_name: postgres-container
     #addind directory with dockerfile to fix image vulnerabilities 
-    image: ahmedmfarouk/devops-mid-project:postgres
+    image: ahmedmfarouk/postgres:v1
     #image: postgres:15-alpine
     environment:
       POSTGRES_HOST: postgres

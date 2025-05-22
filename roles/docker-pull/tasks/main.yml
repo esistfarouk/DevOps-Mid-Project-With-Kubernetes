@@ -2,6 +2,6 @@
   community.docker.docker_image_pull:
     name: "{{item}}"
   loop:
-    - ahmedmfarouk/devops-mid-project:backend
-    - ahmedmfarouk/devops-mid-project:frontend
-    - ahmedmfarouk/devops-mid-project:postgres
+    - ahmedmfarouk/backend:v1
+    - ahmedmfarouk/frontend:v1
+    - ahmedmfarouk/postgres:v1

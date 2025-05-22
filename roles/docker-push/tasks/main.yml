@@ -1,0 +1,17 @@
+- name: Push frontend image
+  community.docker.docker_image_push:
+    name: ahmedmfarouk/frontend
+    tag: v1
+
+- name: Push backend image
+  community.docker.docker_image_push:
+    name: ahmedmfarouk/backend
+    tag: v1
+    
+- name: Push database image
+  community.docker.docker_image_push:
+    name: ahmedmfarouk/postgres
+    tag: v1
+    #only because my internet connection is bad
+    timeout: 600
+  
