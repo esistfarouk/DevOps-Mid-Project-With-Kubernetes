@@ -1,0 +1,4 @@
+- name: Log into DockerHub
+  community.docker.docker_login:
+    username: 'ahmedmfarouk'
+    password: 'my-access-tocken'

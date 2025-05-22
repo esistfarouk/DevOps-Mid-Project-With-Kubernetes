@@ -1,0 +1,22 @@
+# - name: Install Python packages
+#   pip: name={{ item }}
+#   loop:
+#   - dokcer
+- name: Install Docker
+  ansible.builtin.apt:
+    name: docker.io
+    state: present
+  become: yes
+
+- name: Ensure group docker exists
+  ansible.builtin.group:
+    name: docker
+    state: present
+
+
+- name: Add user to docker group
+  ansible.builtin.user:
+    name: "{{ ansible_user }}"
+    groups: docker
+    append: yes
+  become: yes

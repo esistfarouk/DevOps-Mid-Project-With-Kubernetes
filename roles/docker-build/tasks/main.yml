@@ -1,0 +1,132 @@
+- name: Copy docker files and sources
+  ansible.builtin.copy:
+    src: "~/Desktop/devops/DevOps-Mid-Project/{{item}}"
+    dest: "~/Desktop/devops/DevOps-Mid-Project/{{item}}"
+    mode: preserve
+  loop:
+    - frontend/
+    - backend/
+    - database/
+
+- name: Build backend image and push it to my repo in docker hub
+  community.docker.docker_image:
+    build:
+      nocache: true
+      path: ~/Desktop/devops/DevOps-Mid-Project/backend
+      #only because i have a slow internet connection
+      http_timeout: 1000
+    name: ahmedmfarouk/devops-mid-project:backend
+    tag: vesrion1
+    push: true
+    source: build    
+    state: present
+
+- name: Build frontend image and push it to my repo in docker hub
+  community.docker.docker_image:
+    build:
+      nocache: true
+      path: ~/Desktop/devops/DevOps-Mid-Project/frontend
+      #only because i have a slow internet connection
+      http_timeout: 1000
+    name: ahmedmfarouk/devops-mid-project:frontend
+    tag: version1
+    push: true
+    source: build    
+    state: present
+    #force_source: yes
+
+- name: Build database image and push it to my repo in docker hub
+  community.docker.docker_image:
+    build:
+      nocache: true
+      path: ~/Desktop/devops/DevOps-Mid-Project/database
+      #only because i have a slow internet connection
+      http_timeout: 1000
+    name: ahmedmfarouk/devops-mid-project:postgres
+    tag: version1
+    push: true
+    source: build    
+    state: present
+
+
+# ---
+# - name: Building and Pushing Docker Images
+#   tasks:
+#     - name: Copy docker files and sources (frontend)
+#       ansible.builtin.copy:
+#         src: "~/Desktop/devops/DevOps-Mid-Project/frontend/"
+#         dest: "~/Desktop/devops/DevOps-Mid-Project/frontend/"
+#         mode: preserve
+#       notify: Rebuild Docker frontend image
+
+#     - name: Copy docker files and sources (backend)
+#       ansible.builtin.copy:
+#         src: "~/Desktop/devops/DevOps-Mid-Project/backend/"
+#         dest: "~/Desktop/devops/DevOps-Mid-Project/backend/"
+#         mode: preserve
+#       notify: Rebuild Docker backend image
+
+#     - name: Copy docker files and sources (database)
+#       ansible.builtin.copy:
+#         src: "~/Desktop/devops/DevOps-Mid-Project/database/"
+#         dest: "~/Desktop/devops/DevOps-Mid-Project/database/"
+#         mode: preserve
+#       notify: Rebuild Docker database image
+
+#   handlers:
+#     - name: Rebuild Docker backend image
+#       community.docker.docker_image:
+#         build:
+#           nocache: true
+#           path: "~/Desktop/devops/DevOps-Mid-Project/backend"
+#           http_timeout: 0
+#         name: ahmedmfarouk/devops-mid-project:backend
+#         tag: version1
+#         push: true
+#         source: build
+#         state: present
+#         force: yes
+
+#     - name: Rebuild Docker frontend image
+#       community.docker.docker_image:
+#         build:
+#           nocache: true
+#           path: "~/Desktop/devops/DevOps-Mid-Project/frontend"
+#           http_timeout: 0
+#         name: ahmedmfarouk/devops-mid-project:frontend
+#         tag: version1
+#         push: true
+#         source: build
+#         state: present
+#         force: yes
+
+#     - name: Rebuild Docker database image
+#       community.docker.docker_image:
+#         build:
+#           nocache: true
+#           path: "~/Desktop/devops/DevOps-Mid-Project/database"
+#           http_timeout: 0
+#         name: ahmedmfarouk/devops-mid-project:postgres
+#         tag: version1
+#         push: true
+#         source: build
+#         state: present
+#         force: yes
+
+# - name: Building frontend docker image
+#   community.docker.docker_image_build:
+#     name: mid-project-frontend
+#     tag: "1"
+#     path: ~/Desktop/devops/DevOps-Mid-Project/frontend
+
+# - name: Building back docker image
+#   community.docker.docker_image_build:
+#     name: mid-project-backend
+#     tag: "1"
+#     path: ~/Desktop/devops/DevOps-Mid-Project/backend
+
+# - name: Building database docker image
+#   community.docker.docker_image_build:
+#     name: mid-project-postgres
+#     tag: "1"
+#     path: ~/Desktop/devops/DevOps-Mid-Project/database

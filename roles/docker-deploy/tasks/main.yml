@@ -1,0 +1,25 @@
+- name: Copy docker-compose file
+  ansible.builtin.copy:
+    src: "~/Desktop/devops/DevOps-Mid-Project/Deploy/"
+    dest: "~/Desktop/devops/DevOps-Mid-Project/Deploy/"
+    mode: preserve
+
+- name: Ensure Docker CLI plugins directory exists
+  ansible.builtin.file:
+    path: /usr/lib/docker/cli-plugins
+    state: directory
+    mode: "0755"
+  become: yes
+    
+- name: Install Docker Compose plugin (v2)
+  ansible.builtin.get_url:
+    url: "https://github.com/docker/compose/releases/download/v2.26.1/docker-compose-{{ ansible_system | lower }}-{{ ansible_architecture }}"
+    dest: /usr/lib/docker/cli-plugins/docker-compose
+    mode: "0755"
+  register: download_compose
+  become: yes
+
+- name: Run docker compose
+  community.docker.docker_compose_v2:
+    project_src: ~/Desktop/devops/DevOps-Mid-Project/Deploy
+  register: output

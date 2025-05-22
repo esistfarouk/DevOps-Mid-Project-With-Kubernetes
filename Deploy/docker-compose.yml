@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  frontend:
+    container_name: frontend-app
+    image: ahmedmfarouk/devops-mid-project:frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - postgres
+      - backend    
+        
+  backend:
+    container_name: backend-app
+    image: ahmedmfarouk/devops-mid-project:backend
+    ports:
+      - "5000:5000"
+    depends_on:
+      - postgres
+
+
+  postgres:
+    container_name: postgres-container
+    #addind directory with dockerfile to fix image vulnerabilities 
+    image: ahmedmfarouk/devops-mid-project:postgres
+    #image: postgres:15-alpine
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: microservices_db    
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+
+volumes:
+  postgres_data:

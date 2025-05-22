@@ -1,0 +1,24 @@
+- name: Installing pip and docker
+  hosts: all
+  roles:
+    - docker-install
+
+- name: Docker login
+  hosts: all
+  roles:
+    - docker-login
+
+- name: Docker build and push
+  hosts: buildingserver
+  roles:
+    - docker-build
+
+- name: Docker pull and run compose
+  hosts: deploymentserver
+  roles:
+    - docker-pull
+    - docker-deploy
+
+
+
+    
