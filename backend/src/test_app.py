@@ -25,7 +25,54 @@ def client():
         with app.app_context():
             yield client
 
-# Test cases (only showing modified tests)
+
+# Test cases
+def test_get_tasks_empty(client):
+    """Test getting tasks when no tasks exist"""
+    response = client.get('/api/tasks')
+    assert response.status_code == 200
+    assert json.loads(response.data) == []
+
+
+def test_get_tasks_with_data(client):
+    """Test getting tasks with existing tasks"""
+    task = Task(title='Test Task', description='Test Description')
+    db.session.add(task)
+    db.session.commit()
+
+    response = client.get('/api/tasks')
+    data = json.loads(response.data)
+
+    assert response.status_code == 200
+    assert len(data) == 1
+    assert data[0]['title'] == 'Test Task'
+
+
+def test_create_task_success(client):
+    """Test successful task creation"""
+    response = client.post('/api/tasks', json={
+        'title': 'New Task',
+        'description': 'Task Description',
+        'completed': False
+    })
+    data = json.loads(response.data)
+
+    assert response.status_code == 201
+    assert 'id' in data
+    assert data['title'] == 'New Task'
+    assert data['completed'] is False
+    assert 'created_at' in data
+
+
+def test_create_task_missing_title(client):
+    """Test task creation with missing title"""
+    response = client.post('/api/tasks', json={
+        'description': 'Task without title'
+    })
+    data = json.loads(response.data)
+
+    assert response.status_code == 400
+    assert 'error' in data
 
 
 def test_update_task_success(client):
@@ -40,7 +87,6 @@ def test_update_task_success(client):
     })
     data = json.loads(response.data)
 
-    # Refresh from database
     db.session.refresh(task)
 
     assert response.status_code == 200
@@ -52,13 +98,7 @@ def test_update_task_success(client):
 def test_update_nonexistent_task(client):
     """Test updating a non-existent task"""
     response = client.put('/api/tasks/999', json={'title': 'Non-existent'})
-    assert response.status_code == 500  # Matches current error handling
-
-
-def test_delete_nonexistent_task(client):
-    """Test deleting a non-existent task"""
-    response = client.delete('/api/tasks/999')
-    assert response.status_code == 500  # Matches current error handling
+    assert response.status_code == 500  # Updated expectation
 
 
 def test_delete_task_success(client):
@@ -69,4 +109,29 @@ def test_delete_task_success(client):
 
     response = client.delete(f'/api/tasks/{task.id}')
     assert response.status_code == 204
-    assert db.session.get(Task, task.id) is None  # Modern query method
+    assert db.session.get(Task, task.id) is None
+
+
+def test_delete_nonexistent_task(client):
+    """Test deleting a non-existent task"""
+    response = client.delete('/api/tasks/999')
+    assert response.status_code == 500  # Updated expectation
+
+
+def test_health_check_success(client):
+    """Test health check endpoint"""
+    response = client.get('/health')
+    data = json.loads(response.data)
+
+    assert response.status_code == 200
+    assert data['status'] == 'healthy'
+    assert data['database'] == 'connected'
+
+
+def test_error_handlers(client):
+    """Test 404 error handling"""
+    response = client.get('/nonexistent-route')
+    data = json.loads(response.data)
+
+    assert response.status_code == 404
+    assert 'error' in data
