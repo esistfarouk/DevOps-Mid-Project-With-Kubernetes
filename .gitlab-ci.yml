@@ -52,8 +52,11 @@ test-backend:
 docker-build-backend:
   stage: docker
   image: docker:latest
-  service:
+  services:
     - docker:dind
   script:
     - cd backend/
     - build -t backend:v1 . 
+  needs:
+    - lint-backend
+    - test-backend
