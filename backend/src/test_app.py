@@ -5,7 +5,7 @@ from app import app, db, Task
 
 
 # Set environment variables for testing
-os.environ['DATABASE_URL'] = 'sqlite:///:memory:'
+os.environ['DATABASE_URL'] = 'sqlite:///test.db'
 os.environ['TESTING'] = 'True'
 
 
@@ -22,7 +22,9 @@ def setup_db():
 @pytest.fixture
 def client():
     """Test client fixture"""
-    return app.test_client()
+    with app.test_client() as client:
+        with app.app_context():
+            yield client
 
 
 # Test cases
