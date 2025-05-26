@@ -10,4 +10,6 @@ RUN pip uninstall -y setuptools==65.5.1 && pip uninstall -y pip==23.0.1
 
 EXPOSE 5000
 
+ENV PATH="/venv/bin:$PATH"
+
 CMD ["python", "src/app.py"]
