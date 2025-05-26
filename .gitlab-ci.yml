@@ -34,10 +34,12 @@ test-backend:
   services:
       - postgres
   variables:
-      POSTGRES_HOST: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: microservices_db 
-      POSTGRES_HOST_AUTH_METHOD: trust
+      # POSTGRES_HOST: postgres
+      # POSTGRES_PASSWORD: postgres
+      # POSTGRES_DB: microservices_db 
+      # POSTGRES_HOST_AUTH_METHOD: trust    
+      DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/microservices_db"
+      FLASK_ENV: "testing"
 
   stage: test
   script:
