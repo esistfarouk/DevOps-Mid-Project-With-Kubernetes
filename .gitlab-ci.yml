@@ -1,5 +1,9 @@
 include:
-  - template: Jobs/Container-Scanning.gitlab-ci.yml
+  - component: $CI_SERVER_FQDN/pablomxnl/trivy_component/gitlab-ci-trivy@VERSION
+    inputs:
+      docker-image-to-scan: "backend:v1"
+      job-name: security-scan-backend
+
 
 stages:          # List of stages for jobs, and their order of execution
   - config
@@ -70,14 +74,6 @@ docker-build-backend:
     - test-backend
 
  
-container_scanning:
-  stage: docker
-  script:
-    - cd backend/
-    - docker load > backend/backend:v1.tar
-    - docker images
-  image: backend
-  needs:
-    - docker-build-backend
+
 
 
