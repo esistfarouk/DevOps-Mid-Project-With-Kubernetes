@@ -56,7 +56,7 @@ docker-build-backend:
     - docker:dind
   script:
     - cd backend/
-    - build -t backend:v1 . 
+    - docker build -t backend:v1 . 
   needs:
     - lint-backend
     - test-backend
