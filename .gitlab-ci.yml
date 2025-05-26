@@ -69,13 +69,13 @@ docker-build-backend:
     - lint-backend
     - test-backend
 
-security-check-backend:
+ 
+container_scanning:
   stage: docker
   script:
     - cd backend/
     - docker load > backend/backend:v1.tar
-  container_scanning:
-    image: backend:v1
+  image: backend:v1
   needs:
     - docker-build-backend
 
