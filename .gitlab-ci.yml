@@ -1,3 +1,6 @@
+include:
+  - template: Jobs/Container-Scanning.gitlab-ci.yml
+
 stages:          # List of stages for jobs, and their order of execution
   - config
   - notify
@@ -58,6 +61,22 @@ docker-build-backend:
   script:
     - cd backend/
     - docker build -t backend:v1 . 
+    - docker save backend:v1 > backend:v1.tar
+  artifacts:
+    paths:
+      - backend/backend:v1.tar
   needs:
     - lint-backend
     - test-backend
+
+security-check-backend:
+  stage: docker
+  script:
+    - cd backend/
+    - docker load > backend/backend:v1.tar
+  container_scanning:
+    image: backend:v1
+  needs:
+    - docker-build-backend
+
+
