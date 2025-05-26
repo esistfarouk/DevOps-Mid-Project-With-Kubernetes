@@ -43,7 +43,7 @@ class Task(db.Model):
     description = db.Column(db.Text)
     completed = db.Column(db.Boolean, default=False)
     created_at = db.Column(
-        db.DateTime, 
+        db.DateTime,
         server_default=db.func.now()
     )
     updated_at = db.Column(
@@ -58,9 +58,9 @@ class Task(db.Model):
             'title': self.title,
             'description': self.description,
             'completed': self.completed,
-            'created_at': self.created_at.isoformat() 
+            'created_at': self.created_at.isoformat()
             if self.created_at else None,
-            'updated_at': self.updated_at.isoformat() 
+            'updated_at': self.updated_at.isoformat()
             if self.updated_at else None
         }
 
