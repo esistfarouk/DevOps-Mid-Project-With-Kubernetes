@@ -31,6 +31,14 @@ lint-backend:
     - build-backend
 
 test-backend:
+  services:
+      - postgres
+  variables:
+      POSTGRES_HOST: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: microservices_db 
+      POSTGRES_HOST_AUTH_METHOD: trust
+
   stage: test
   script:
     - cd backend/
