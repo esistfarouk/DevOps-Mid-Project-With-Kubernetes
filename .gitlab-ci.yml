@@ -75,7 +75,8 @@ container_scanning:
   script:
     - cd backend/
     - docker load > backend/backend:v1.tar
-  image: backend:v1
+    - docker images
+  image: backend
   needs:
     - docker-build-backend
 
