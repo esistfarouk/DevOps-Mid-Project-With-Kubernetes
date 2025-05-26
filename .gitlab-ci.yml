@@ -48,3 +48,12 @@ test-backend:
     - pytest src/
   needs: 
     - build-backend
+
+docker-build-backend:
+  stage: docker
+  image: docker:latest
+  service:
+    - docker:dind
+  script:
+    - cd backend/
+    - build -t backend:v1 . 
