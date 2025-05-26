@@ -17,9 +17,9 @@ build-backend:       # This job runs in the build stage, which runs first.
     - pip install -r requirements.txt
   artifacts:
     paths:
-      - venv/
-      - src/
-      - requirements.txt
+      - backend/venv/
+      - backend/src/
+      - backend/requirements.txt
   
 lint-backend:
   stage: test
