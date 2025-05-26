@@ -1,7 +1,7 @@
 import os
 import pytest
 import json
-from app.py import app, db, Task
+from app import app, db, Task
 
 
 # Set environment variables for testing
