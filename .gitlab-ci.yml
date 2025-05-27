@@ -105,6 +105,8 @@ docker-build-backend:
 
 trivy-backend:
   stage: test
+  script:
+    - cd .
   extends:
     .container_scanning
   variables:
