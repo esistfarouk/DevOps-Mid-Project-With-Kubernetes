@@ -94,18 +94,17 @@ docker-build-backend:
   script:
     - cd backend/
     - docker build -t backend:v1 . 
+    - cd ..
     - docker save backend:v1 > backend:v1.tar
   artifacts:
     paths:
-      - backend/backend:v1.tar
+      - backend:v1.tar
   needs:
     - lint-backend
     - test-backend
 
 trivy-backend:
   stage: test
-  script:
-    - cd backend/
   extends:
     .container_scanning
   variables:
@@ -115,7 +114,7 @@ trivy-backend:
   artifacts:
     when:                          always
     reports:
-      container_scanning:          backend/gl-container-scanning-report.json
+      container_scanning:          gl-container-scanning-report.json
  
 
 
