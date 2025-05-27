@@ -97,20 +97,19 @@ docker-build-backend:
     - docker save backend:v1 > backend:v1.tar
   artifacts:
     paths:
-      - backend/backend:v1.tar
+      - backend/c
   needs:
     - lint-backend
     - test-backend
 
 trivy-backend:
+  stage: test
   script:
     - cd backend/
-    - docker load < backend:v1.tar
-    - docker images
   extends:
     .container_scanning
   variables:
-    FULL_IMAGE_NAME: backend:v1
+    FULL_IMAGE_NAME: backend:v1.tar
   needs:
     - docker-build-backend
 
