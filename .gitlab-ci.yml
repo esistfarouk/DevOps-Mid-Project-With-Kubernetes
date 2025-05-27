@@ -97,7 +97,7 @@ docker-build-backend:
     - docker save backend:v1 > backend:v1.tar
   artifacts:
     paths:
-      - backend/c
+      - backend/backend:v1.tar
   needs:
     - lint-backend
     - test-backend
