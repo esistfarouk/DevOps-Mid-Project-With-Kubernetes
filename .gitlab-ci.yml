@@ -96,7 +96,8 @@ docker-build-backend:
   script:
     - cd backend/
     - docker build -t backend:v1 . 
-    - docker save backend:v1 -o ../backend-v1.tar  # Save to parent directory
+    - cd ../
+    - docker save backend:v1 backend-v1.tar 
   artifacts:
     paths:
       - backend:v1.tar
