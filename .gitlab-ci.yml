@@ -40,12 +40,11 @@ stages:          # List of stages for jobs, and their order of execution
   - notify
   - build
   - test
-  - docker
   - deploy
 
 
 image: python:3.10
-build-backend:       # This job runs in the build stage, which runs first.
+build-bakcend:       # This job runs in the build stage, which runs first.
   stage: build
   script:
     - cd backend/
@@ -59,7 +58,7 @@ build-backend:       # This job runs in the build stage, which runs first.
       - backend/requirements.txt
   
 lint-backend:
-  stage: test
+  stage: build
   script:
     - cd backend/
     - pip install flake8
@@ -69,6 +68,7 @@ lint-backend:
     - build-backend
 
 test-backend:
+  stage: build
   services:
       - postgres
   variables:
@@ -78,7 +78,6 @@ test-backend:
       POSTGRES_HOST_AUTH_METHOD: trust    
       DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/microservices_db"
       FLASK_ENV: "testing"
-  stage: test
   script:
     - cd backend/
     - pip install pytest
@@ -88,7 +87,7 @@ test-backend:
     - build-backend
 
 docker-build-backend:
-  stage: docker
+  stage: build
   image: docker:latest
   services:
     - docker:dind
@@ -112,6 +111,8 @@ trivy-backend:
     .container_scanning
   variables:
     FULL_IMAGE_NAME: backend:v1
+  needs:
+    - docker-build-backend
 
  
 
