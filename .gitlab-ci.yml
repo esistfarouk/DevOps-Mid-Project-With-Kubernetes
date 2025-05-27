@@ -11,9 +11,9 @@
     - trivy clean --scan-cache
     - time trivy image --download-db-only
     - mkdir -p .trivycache
-    - time trivy image --input backend-image.tar --exit-code 0 --format template --template "@/contrib/gitlab.tpl" --output "gl-container-scanning-report.json" "$FULL_IMAGE_NAME"
-    - time trivy image --input backend-image.tar --exit-code 0 "$FULL_IMAGE_NAME"
-    - time trivy image --input backend-image.tar --exit-code 1 --severity CRITICAL "$FULL_IMAGE_NAME"
+    - time trivy image --input $TAR_IMAGE_NAME --exit-code 0 --format template --template "@/contrib/gitlab.tpl" --output "$FULL_IMAGE_NAME-scanning-report.json" "$FULL_IMAGE_NAME"
+    - time trivy image --input $TAR_IMAGE_NAME --exit-code 0 "$FULL_IMAGE_NAME"
+    - time trivy image --input $TAR_IMAGE_NAME --exit-code 1 --severity CRITICAL "$FULL_IMAGE_NAME"
   cache:
     paths:
       - .trivycache/
@@ -94,6 +94,7 @@ trivy-backend:
   stage: test
   extends: .container_scanning
   variables:
+    TAR_IMAGE_NAME: backend-image.tar
     FULL_IMAGE_NAME: backend:v1
   needs:
     - docker-build-backend
