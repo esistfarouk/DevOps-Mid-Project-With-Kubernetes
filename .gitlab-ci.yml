@@ -15,7 +15,8 @@
   script:
     - trivy --version
     # cache cleanup is needed when scanning images with the same tags, it does not remove the database
-    - time trivy image --clear-cache
+    - trivy clean --scan-cache
+    - time trivy image
     # update vulnerabilities db
     - time trivy image --download-db-only
     # Builds report and puts it in the default workdir $CI_PROJECT_DIR, so `artifacts:` can take it from there
@@ -111,10 +112,6 @@ trivy-backend:
     FULL_IMAGE_NAME: backend:v1.tar
   needs:
     - docker-build-backend
-  artifacts:
-    when:                          always
-    reports:
-      container_scanning:          gl-container-scanning-report.json
  
 
 
