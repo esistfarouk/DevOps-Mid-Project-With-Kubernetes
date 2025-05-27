@@ -112,7 +112,10 @@ trivy-backend:
     FULL_IMAGE_NAME: backend:v1.tar
   needs:
     - docker-build-backend
-
+  artifacts:
+    when:                          always
+    reports:
+      container_scanning:          backend/gl-container-scanning-report.json
  
 
 
