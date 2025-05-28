@@ -164,7 +164,7 @@ trivy-frontend:
     - docker-build-frontend
 
 
-docker-build-database:
+docker-build-postgres:
   stage: build
   image: docker:latest
   services:
