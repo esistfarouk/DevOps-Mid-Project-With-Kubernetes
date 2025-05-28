@@ -216,6 +216,9 @@ docker-compose:
   services:
     - docker:dind
   script:
+    - docker load -i frontend-image.tar
+    - docker load -i backend-image.tar
+    - docker load -i postgres-image.tar
     - docker compose down
     - docker compose up 
   needs:
