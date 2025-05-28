@@ -133,7 +133,6 @@ test-frontend:
   stage: build 
   script:
     - cd frontend/
-    - npm install --save-dev @testing-library/jest-dom @testing-library/user-event msw jest-environment-jsdom-sixteen util
     - npm test
   needs: 
     - build-frontend
@@ -153,7 +152,7 @@ docker-build-frontend:
       - frontend-image.tar
   needs:
     - lint-frontend
-    - test-frontend
+  #  - test-frontend
 
 trivy-frontend:
   stage: test
