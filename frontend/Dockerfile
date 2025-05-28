@@ -3,7 +3,8 @@ FROM nginx:stable-alpine
 # update libxml2 to fix vulnerabilities
 RUN apk update && apk upgrade --no-cache
 
-COPY build/ /usr/share/nginx/html
+COPY . .
+COPY /build /usr/share/nginx/html
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
