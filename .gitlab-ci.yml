@@ -133,8 +133,8 @@ test-frontend:
   stage: build 
   script:
     - cd frontend/
-    - npm install --save-dev @testing-library/jest-dom @testing-library/user-event msw@0.36.8 util @babel/preset-env @babel/preset-react
-    - npm test --watchAll=false
+    - npm install --save-dev @testing-library/react @testing-library/jest-dom jest axios jest-environment-jsdom msw
+    - npm test
   needs: 
     - build-frontend
 
