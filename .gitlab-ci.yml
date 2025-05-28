@@ -153,8 +153,6 @@ docker-build-frontend:
   needs:
     - lint-frontend
     - test-frontend
-    - job: build-frontend
-      artifacts: true
 
 trivy-frontend:
   stage: security-scan
@@ -201,4 +199,9 @@ docker-compose:
     - trivy-frontend
     - trivy-backend
     - trivy-postgres
-  
+    - job: docker-build-frontend
+      artifacts: true
+    - job: docker-build-backend
+      artifacts: true
+    - job: docker-build-postgres
+      artifacts: true
