@@ -144,7 +144,7 @@ docker-build-frontend:
   services:
     - docker:dind
   script:
-    - cd front/
+    - cd frontend/
     - docker build -t frontend:v1 .
     - cd ..
     - docker save frontend:v1 -o frontend-image.tar
