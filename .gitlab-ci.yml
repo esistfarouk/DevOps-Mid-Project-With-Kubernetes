@@ -73,8 +73,8 @@ test-backend:
   needs: 
     - build-backend
 
+image: node:18
 build-frontend:
-  image: node:18-alpine
   stage: build
   script:
     - cd frontend/
@@ -88,6 +88,23 @@ build-frontend:
     paths:
       - frontend/node_modules/
     policy: pull-push
+
+
+lint-frontend:
+  stage: build
+  script:
+    - cd frontend/
+    - npm install --save-dev eslint eslint-plugin-react eslint-plugin-react-hooks eslint-plugin-jsx-a11y @typescript-eslint/parser @typescript-eslint/eslint-plugin
+    - npm run lint
+  needs: build-frontend
+
+test-frontend:
+  stage: build:
+  script:
+    - cd frontend/
+    - npm install --save-dev @testing-library/jest-dom @testing-library/user-event msw
+    - npm test
+  needs: build-frontend
 
 
 docker-build-backend:
