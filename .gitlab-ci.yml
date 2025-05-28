@@ -111,7 +111,7 @@ test-frontend:
   stage: build
   script:
     - cd frontend/
-    - npm install --save-dev @testing-library/jest-dom @testing-library/user-event msw jest-environment-jsdom-sixteen
+    - npm install --save-dev @testing-library/jest-dom @testing-library/user-event msw@0.36.8 jest-environment-jsdom-sixteen
     - npm test
   needs: 
     - build-frontend
