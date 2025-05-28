@@ -37,7 +37,7 @@ slack-notify:
     - >-
       curl -X POST 
       -H 'Content-type: application/json'
-      --data '{"text":":drum_with_drumsticks: :drum_with_drumsticks: :drum_with_drumsticks:\n\n🚀 *NEW DEPLOYMENT* 🎉\n*Project:* $CI_PROJECT_NAME\n*Environment:* $CI_ENVIRONMENT_NAME\n*Branch:* $CI_COMMIT_REF_NAME\n*Pipeline:* <$CI_PIPELINE_URL|#$CI_PIPELINE_ID>\n*Commit:* <$CI_PROJECT_URL/-/commit/$CI_COMMIT_SHA|${CI_COMMIT_SHA:0:8}> - $CI_COMMIT_MESSAGE\n:rocket: Deployed by $GITLAB_USER_NAME"}'
+      --data '{"text":":drum_with_drumsticks: :drum_with_drumsticks: :drum_with_drumsticks:\n:rocket: NEW DEPLOYMENT :tada:\nProject: $CI_PROJECT_NAME\nEnvironment: $CI_ENVIRONMENT_NAME\nBranch: $CI_COMMIT_REF_NAME\nPipeline: <$CI_PIPELINE_URL|#$CI_PIPELINE_ID>\nCommit: <$CI_PROJECT_URL/-/commit/$CI_COMMIT_SHA|${CI_COMMIT_SHA:0:8}> - $CI_COMMIT_MESSAGE\n:rocket: Deployed by $GITLAB_USER_NAME"}'
       https://hooks.slack.com/services/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
       
 build-backend:
@@ -200,8 +200,8 @@ docker-compose:
   services:
     - docker:dind
   script:
-    - docker compose -f Deply/docker-compose.yml down
-    - docker compose -f Deply/docker-compose.yml up 
+    - docker compose down
+    - docker compose up 
   needs:
     - trivy-frontend
     - trivy-backend
