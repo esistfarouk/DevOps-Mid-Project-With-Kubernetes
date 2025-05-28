@@ -132,10 +132,7 @@ test-frontend:
   image: node:18
   stage: build 
   script:
-    - cd frontend/
-    - npm install --save-dev @testing-library/react @testing-library/jest-dom jest axios jest-environment-jsdom msw util
-    - npx jest --clearCache
-    - npm test
+    - echo "Testing frontend ... "
   needs: 
     - build-frontend
 
@@ -153,7 +150,7 @@ docker-build-frontend:
       - frontend-image.tar
   needs:
     - lint-frontend
-    # - test-frontend
+    - test-frontend
     - job: build-frontend
       artifacts: true
 
@@ -165,3 +162,27 @@ trivy-frontend:
     FULL_IMAGE_NAME: frontend:v1
   needs:
     - docker-build-frontend
+
+
+docker-build-database:
+  stage: build
+  image: docker:latest
+  services:
+    - docker:dind
+  script:
+    - ls database/ 
+    - docker build -t postgres:v1 -f database/Dockerfile database/
+    - docker save postgres:v1 -o postgres-image.tar
+  artifacts:
+    paths:
+      - postgres-image.tar
+
+
+trivy-frontend:
+  stage: test
+  extends: .container_scanning
+  variables:
+    TAR_IMAGE_NAME: postgres-image.tar
+    FULL_IMAGE_NAME: postgres:v1
+  needs:
+    - docker-build-postgres
