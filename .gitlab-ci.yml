@@ -134,7 +134,7 @@ test-frontend:
   script:
     - cd frontend/
     - npm install --save-dev @testing-library/jest-dom @testing-library/user-event msw@0.36.8 util @babel/preset-env @babel/preset-react
-    - npm test
+    - npm test --watchAll=false
   needs: 
     - build-frontend
 
