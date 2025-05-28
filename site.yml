@@ -1,29 +1,10 @@
 - name: Installing docker
-  hosts: all
+  hosts: deploymentserver
   roles:
     - docker-install
 
 - name: Docker login
-  hosts: all
+  hosts: deploymentserver
   roles:
     - docker-login
 
-- name: Docker build
-  hosts: buildingserver
-  roles:
-    - docker-build
-    
-- name: Docker push
-  hosts: buildingserver
-  roles:
-    - docker-push
-
-- name: Docker pull and run compose
-  hosts: deploymentserver
-  roles:
-    - docker-pull
-    - docker-deploy
-
-
-
-    
