@@ -133,7 +133,7 @@ test-frontend:
   stage: build 
   script:
     - cd frontend/
-    - npm install --save-dev @testing-library/react @testing-library/jest-dom jest axios jest-environment-jsdom msw
+    - npm install --save-dev @testing-library/react @testing-library/jest-dom jest axios jest-environment-jsdom msw util
     - npm test
   needs: 
     - build-frontend
