@@ -36,7 +36,7 @@ slack-notify:
   script:
     - |
       curl -X POST -H 'Content-type: application/json' --data '{
-        "text": "NEW DEPLOYMENT\n\n
+        "text": ":drum_with_drumsticks: :drum_with_drumsticks: :drum_with_drumsticks:\n:rocket: NEW DEPLOYMENT :tada:\n\n
         Project: '"$CI_PROJECT_NAME"'\n
         Environment: '"$CI_ENVIRONMENT_NAME"'\n
         Branch: '"$CI_COMMIT_REF_NAME"'\n
