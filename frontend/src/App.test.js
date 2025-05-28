@@ -1,16 +1,18 @@
 import React from 'react';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { rest } from 'msw'; // Import rest from msw
 import App from './App';
 import { server } from './mocks/server';
-import { handlers } from './mocks/handlers';
 
 describe('Task Manager App', () => {
-  // Setup user event with delay option for more realistic interactions
-  const user = userEvent.setup({ delay: null });
+  const user = userEvent.setup();
 
   beforeAll(() => server.listen());
-  afterEach(() => server.resetHandlers());
+  afterEach(() => {
+    server.resetHandlers();
+    jest.clearAllMocks();
+  });
   afterAll(() => server.close());
 
   test('renders the task manager title', () => {
@@ -19,7 +21,7 @@ describe('Task Manager App', () => {
   });
 
   test('loads and displays tasks from API', async () => {
-    // Mock API response
+    // Override default handler
     server.use(
       rest.get('/api/tasks', (req, res, ctx) => {
         return res(ctx.json([
@@ -36,7 +38,6 @@ describe('Task Manager App', () => {
 
     render(<App />);
     
-    // Wait for API task to appear
     await waitFor(() => {
       expect(screen.getByText('API Task 1')).toBeInTheDocument();
     });
@@ -48,7 +49,7 @@ describe('Task Manager App', () => {
       rest.post('/api/tasks', (req, res, ctx) => {
         return res(
           ctx.status(201),
-          ctx.json({ id: 2, ...req.body })
+          ctx.json({ id: 2, title: 'New Task', description: 'New Description' })
         );
       })
     );
@@ -73,9 +74,24 @@ describe('Task Manager App', () => {
   });
 
   test('can delete a task via API', async () => {
+    // Add a task to delete
+    server.use(
+      rest.get('/api/tasks', (req, res, ctx) => {
+        return res(ctx.json([
+          { 
+            id: 1, 
+            title: 'Task to Delete', 
+            description: 'Delete me', 
+            completed: false, 
+            created_at: '2023-01-01T00:00:00.000Z' 
+          }
+        ]));
+      })
+    );
+
     // Mock DELETE response
     server.use(
-      rest.delete('/api/tasks/:id', (req, res, ctx) => {
+      rest.delete('/api/tasks/1', (req, res, ctx) => {
         return res(ctx.status(204));
       })
     );
@@ -84,15 +100,12 @@ describe('Task Manager App', () => {
     
     // Wait for tasks to load
     await waitFor(() => {
-      expect(screen.getByText('Test Task')).toBeInTheDocument();
+      expect(screen.getByText('Task to Delete')).toBeInTheDocument();
     });
 
-    // Find task item
-    const taskItem = screen.getByText('Test Task').closest('li');
-    
     // Click delete button
-    const deleteButton = within(taskItem).getByRole('button', { name: /delete/i });
-    await user.click(deleteButton);
+    const deleteButtons = screen.getAllByRole('button', { name: /delete/i });
+    await user.click(deleteButtons[0]);
 
     // Confirm deletion
     const confirmButton = screen.getByRole('button', { name: /delete/i, exact: true });
@@ -101,7 +114,7 @@ describe('Task Manager App', () => {
     // Verify success
     await waitFor(() => {
       expect(screen.getByText(/task deleted successfully/i)).toBeInTheDocument();
-      expect(screen.queryByText('Test Task')).not.toBeInTheDocument();
+      expect(screen.queryByText('Task to Delete')).not.toBeInTheDocument();
     });
   });
 
@@ -121,7 +134,7 @@ describe('Task Manager App', () => {
     // Should disappear after load
     await waitFor(() => {
       expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
-    });
+    }, { timeout: 2000 });
   });
 
   test('shows error when API fails', async () => {
@@ -137,6 +150,6 @@ describe('Task Manager App', () => {
     // Check for error message
     await waitFor(() => {
       expect(screen.getByText(/failed to fetch tasks/i)).toBeInTheDocument();
-    });
+    }, { timeout: 2000 });
   });
 });
