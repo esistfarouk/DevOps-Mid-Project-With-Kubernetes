@@ -27,6 +27,8 @@ stages:
   - config
   - build
   - test
+  - dockerization
+  - security-scan
   - deploy
 
 
@@ -46,7 +48,7 @@ build-backend:
 
 lint-backend:
   image: python:3.10
-  stage: build
+  stage: test
   script:
     - cd backend/
     - pip install flake8
@@ -57,7 +59,7 @@ lint-backend:
 
 test-backend:
   image: python:3.10
-  stage: build
+  stage: test
   services:
     - postgres
   variables:
@@ -76,7 +78,7 @@ test-backend:
     - build-backend
 
 docker-build-backend:
-  stage: build
+  stage: dockerization
   image: docker:latest
   services:
     - docker:dind
@@ -93,7 +95,7 @@ docker-build-backend:
     - test-backend
 
 trivy-backend:
-  stage: test
+  stage: security-scan
   extends: .container_scanning
   variables:
     TAR_IMAGE_NAME: backend-image.tar
@@ -120,7 +122,7 @@ build-frontend:
 
 lint-frontend:
   image: node:18
-  stage: build
+  stage: test
   script:
     - cd frontend/
     - npm install --save-dev eslint eslint-plugin-react eslint-plugin-react-hooks eslint-plugin-jsx-a11y @typescript-eslint/parser @typescript-eslint/eslint-plugin
@@ -130,14 +132,14 @@ lint-frontend:
 
 test-frontend:
   image: node:18
-  stage: build 
+  stage: test 
   script:
     - echo "Testing frontend ... "
   needs: 
     - build-frontend
 
 docker-build-frontend:
-  stage: build
+  stage: dockerization
   image: docker:latest
   services:
     - docker:dind
@@ -155,7 +157,7 @@ docker-build-frontend:
       artifacts: true
 
 trivy-frontend:
-  stage: test
+  stage: security-scan
   extends: .container_scanning
   variables:
     TAR_IMAGE_NAME: frontend-image.tar
@@ -165,7 +167,7 @@ trivy-frontend:
 
 
 docker-build-postgres:
-  stage: build
+  stage: dockerization
   image: docker:latest
   services:
     - docker:dind
@@ -179,7 +181,7 @@ docker-build-postgres:
 
 
 trivy-postgres:
-  stage: test
+  stage: security-scan
   extends: .container_scanning
   variables:
     TAR_IMAGE_NAME: postgres-image.tar
