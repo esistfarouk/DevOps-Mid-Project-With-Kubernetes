@@ -43,7 +43,19 @@ slack-notify:
         Commit: <'"$CI_PROJECT_URL"'/-/commit/'"$CI_COMMIT_SHA"'|'"${CI_COMMIT_SHA:0:8}"'> - '"$CI_COMMIT_MESSAGE"'\n
         Deployed by '"$GITLAB_USER_NAME"'"
       }' https://hooks.slack.com/services/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
+  only:
+    - main
       
+config-deployment-machine:
+  stage: config
+  image: ansible
+  script:
+    - ansible-palybook site.yml -i inventory.ini
+  only:
+    - configuration_branch
+
+
+
 build-backend:
   image: python:3.10
   stage: build
