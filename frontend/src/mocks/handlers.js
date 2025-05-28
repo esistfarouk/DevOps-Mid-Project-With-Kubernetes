@@ -1,33 +1,37 @@
-// src/__tests__/mocks/handlers.js
+// src/mocks/handlers.js
 import { rest } from 'msw';
 
 export const handlers = [
+  // Default GET /tasks handler
   rest.get('/api/tasks', (req, res, ctx) => {
     return res(
       ctx.json([
-        { id: 1, title: 'Test Task 1', description: 'Description 1', completed: false, created_at: '2023-01-01' },
-        { id: 2, title: 'Test Task 2', description: 'Description 2', completed: true, created_at: '2023-01-02' }
+        { 
+          id: 1, 
+          title: 'Test Task', 
+          description: 'Test Description', 
+          completed: false, 
+          created_at: '2023-01-01T00:00:00.000Z' 
+        }
       ])
     );
   }),
-  
+
+  // Default POST /tasks handler
   rest.post('/api/tasks', (req, res, ctx) => {
     return res(
-      ctx.json({ id: 3, ...req.body }),
-      ctx.status(201)
+      ctx.status(201),
+      ctx.json({ id: 2, ...req.body })
     );
   }),
-  
-  rest.put('/api/tasks/:id', (req, res, ctx) => {
-    return res(
-      ctx.json({ ...req.body, id: req.params.id }),
-      ctx.status(200)
-    );
-  }),
-  
+
+  // Default DELETE /tasks/:id handler
   rest.delete('/api/tasks/:id', (req, res, ctx) => {
-    return res(
-      ctx.status(204)
-    );
-  })
+    return res(ctx.status(204));
+  }),
+
+  // Default PUT /tasks/:id handler
+  rest.put('/api/tasks/:id', (req, res, ctx) => {
+    return res(ctx.json({ ...req.body, id: req.params.id }));
+  }),
 ];
