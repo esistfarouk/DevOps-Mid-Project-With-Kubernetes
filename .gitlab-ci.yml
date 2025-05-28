@@ -44,7 +44,6 @@ build-backend:
       - backend/src/
       - backend/requirements.txt
 
-
 lint-backend:
   image: python:3.10
   stage: build
@@ -55,7 +54,6 @@ lint-backend:
     - flake8 src/
   needs: 
     - build-backend
-
 
 test-backend:
   image: python:3.10
@@ -77,46 +75,6 @@ test-backend:
   needs: 
     - build-backend
 
-
-build-frontend:
-  image: node:18
-  stage: build
-  script:
-    - cd frontend/
-    - npm install
-    - npm run build
-  artifacts:
-    paths:
-      - frontend/build/
-  cache:
-    key: ${CI_COMMIT_REF_SLUG}
-    paths:
-      - frontend/node_modules/
-    policy: pull-push
-
-
-lint-frontend:
-  image: node:18
-  stage: build
-  script:
-    - cd frontend/
-    - npm install --save-dev eslint eslint-plugin-react eslint-plugin-react-hooks eslint-plugin-jsx-a11y @typescript-eslint/parser @typescript-eslint/eslint-plugin
-    - npm run lint
-  needs: 
-    - build-frontend
-
-
-test-frontend:
-  image: node:18
-  stage: build
-  script:
-    - cd frontend/
-    - npm install --save-dev @testing-library/jest-dom @testing-library/user-event msw@0.36.8 jest-environment-jsdom-sixteen
-    - npm test
-  needs: 
-    - build-frontend
-
-
 docker-build-backend:
   stage: build
   image: docker:latest
@@ -134,7 +92,6 @@ docker-build-backend:
     - lint-backend
     - test-backend
 
-
 trivy-backend:
   stage: test
   extends: .container_scanning
@@ -143,3 +100,66 @@ trivy-backend:
     FULL_IMAGE_NAME: backend:v1
   needs:
     - docker-build-backend
+
+
+build-frontend:
+  image: node:18
+  stage: build
+  script:
+    - cd frontend/
+    - npm install
+    - npm run build
+  artifacts:
+    paths:
+      - frontend/build/
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - frontend/node_modules/
+    policy: pull-push
+
+lint-frontend:
+  image: node:18
+  stage: build
+  script:
+    - cd frontend/
+    - npm install --save-dev eslint eslint-plugin-react eslint-plugin-react-hooks eslint-plugin-jsx-a11y @typescript-eslint/parser @typescript-eslint/eslint-plugin
+    - npm run lint
+  needs: 
+    - build-frontend
+
+test-frontend:
+  image: node:18
+  stage: build
+  script:
+    - cd frontend/
+    - npm install --save-dev @testing-library/jest-dom @testing-library/user-event msw jest-environment-jsdom-sixteen util
+    - npm test
+  needs: 
+    - build-frontend
+
+docker-build-frontend:
+  stage: build
+  image: docker:latest
+  services:
+    - docker:dind
+  script:
+    - cd front/
+    - docker build -t frontend:v1 .
+    - cd ..
+    - docker save frontend:v1 -o frontend-image.tar
+  artifacts:
+    paths:
+      - frontend-image.tar
+  needs:
+    - lint-frontend
+    - test-frontend
+
+trivy-frontend:
+  stage: test
+  extends: .container_scanning
+  variables:
+    TAR_IMAGE_NAME: frontend-image.tar
+    FULL_IMAGE_NAME: frontend:v1
+  needs:
+    - docker-build-frontend
