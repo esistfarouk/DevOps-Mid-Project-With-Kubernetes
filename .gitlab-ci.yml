@@ -220,7 +220,7 @@ docker-compose:
     - docker load -i backend-image.tar
     - docker load -i postgres-image.tar
     - docker compose down
-    - docker compose up 
+    - docker compose up -d
   needs:
     - trivy-frontend
     - trivy-backend
