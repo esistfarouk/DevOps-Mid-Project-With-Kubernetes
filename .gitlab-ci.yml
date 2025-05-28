@@ -99,7 +99,7 @@ lint-frontend:
   needs: build-frontend
 
 test-frontend:
-  stage: build:
+  stage: build
   script:
     - cd frontend/
     - npm install --save-dev @testing-library/jest-dom @testing-library/user-event msw
