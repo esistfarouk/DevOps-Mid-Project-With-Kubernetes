@@ -158,7 +158,6 @@ test-frontend:
     policy: pull-push
   script:
     - cd frontend/
-    - npm ci --no-audit  # Clean install (faster/more reliable than 'npm install')
     - npm install --save-dev @testing-library/jest-dom @testing-library/user-event msw jest-environment-jsdom-sixteen util
     - npm test
   needs: 
