@@ -96,7 +96,8 @@ lint-frontend:
     - cd frontend/
     - npm install --save-dev eslint eslint-plugin-react eslint-plugin-react-hooks eslint-plugin-jsx-a11y @typescript-eslint/parser @typescript-eslint/eslint-plugin
     - npm run lint
-  needs: build-frontend
+  needs: 
+    - build-frontend
 
 test-frontend:
   stage: build
@@ -104,7 +105,8 @@ test-frontend:
     - cd frontend/
     - npm install --save-dev @testing-library/jest-dom @testing-library/user-event msw
     - npm test
-  needs: build-frontend
+  needs: 
+    - build-frontend
 
 
 docker-build-backend:
