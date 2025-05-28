@@ -50,6 +50,7 @@ config-deployment-machine:
   stage: config
   image: ansible
   script:
+    - echo "$DEPLOYMENT_MACHINE_IP    $DEPLYMEN_MACHINE_HOSTNAME" | sudo tee -a /etc/hosts
     - ansible-palybook site.yml -i inventory.ini
   only:
     - configuration_branch
