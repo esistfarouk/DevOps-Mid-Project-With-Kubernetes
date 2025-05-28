@@ -179,7 +179,6 @@ docker-build-postgres:
     paths:
       - postgres-image.tar
 
-
 trivy-postgres:
   stage: security-scan
   extends: .container_scanning
@@ -188,3 +187,18 @@ trivy-postgres:
     FULL_IMAGE_NAME: postgres:v1
   needs:
     - docker-build-postgres
+
+docker-compose:
+  stage: deploy
+  image: docker:latest
+  services:
+    - docker:dind
+  script:
+    - cd Deploy/
+    - docker compose down
+    - docker compose up 
+  needs:
+    - trivy-frontend
+    - trivy-backend
+    - trivy-postgres
+  
