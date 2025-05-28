@@ -178,7 +178,7 @@ docker-build-database:
       - postgres-image.tar
 
 
-trivy-frontend:
+trivy-postgres:
   stage: test
   extends: .container_scanning
   variables:
