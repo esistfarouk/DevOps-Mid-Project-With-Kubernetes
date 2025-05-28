@@ -38,7 +38,6 @@ slack-notify:
       curl -X POST -H 'Content-type: application/json' --data '{
         "text": ":drum_with_drumsticks: :drum_with_drumsticks: :drum_with_drumsticks:\n:rocket: NEW DEPLOYMENT :tada:\n\n
         Project: '"$CI_PROJECT_NAME"'\n
-        Environment: '"$CI_ENVIRONMENT_NAME"'\n
         Branch: '"$CI_COMMIT_REF_NAME"'\n
         Pipeline: <'"$CI_PIPELINE_URL"'|#'"$CI_PIPELINE_ID"'>\n
         Commit: <'"$CI_PROJECT_URL"'/-/commit/'"$CI_COMMIT_SHA"'|'"${CI_COMMIT_SHA:0:8}"'> - '"$CI_COMMIT_MESSAGE"'\n
