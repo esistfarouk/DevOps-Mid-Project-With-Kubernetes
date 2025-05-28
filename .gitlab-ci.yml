@@ -31,6 +31,11 @@ stages:
   - security-scan
   - deploy
 
+slack-notify:
+  stage: notify
+  script:
+    - curl -X POST -H 'Content-type: application/json' --data '{"text":"Hello, World!"}' https://hooks.slack.com/services/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
+
 
 build-backend:
   image: python:3.10
@@ -192,9 +197,8 @@ docker-compose:
   services:
     - docker:dind
   script:
-    - cd Deploy/
     - docker compose down
-    - docker compose up 
+    - docker compose up -f Deply/docker-compose.yml
   needs:
     - trivy-frontend
     - trivy-backend
