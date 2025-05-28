@@ -133,7 +133,7 @@ test-frontend:
   stage: build 
   script:
     - cd frontend/
-    - npm install --save-dev @testing-library/jest-dom @testing-library/user-event msw@0.36.8 util
+    - npm install --save-dev @testing-library/jest-dom @testing-library/user-event msw@0.36.8 util @babel/preset-env @babel/preset-react
     - npm test
   needs: 
     - build-frontend
@@ -144,16 +144,17 @@ docker-build-frontend:
   services:
     - docker:dind
   script:
-    - cd frontend/
-    - docker build -t frontend:v1 .
-    - cd ..
+    - ls frontend/ 
+    - docker build -t frontend:v1 -f frontend/Dockerfile frontend/
     - docker save frontend:v1 -o frontend-image.tar
   artifacts:
     paths:
       - frontend-image.tar
   needs:
     - lint-frontend
-  #  - test-frontend
+    # - test-frontend
+    - build-frontend
+      artifacts: true
 
 trivy-frontend:
   stage: test
