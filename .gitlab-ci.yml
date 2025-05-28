@@ -33,11 +33,6 @@ stages:
 build-backend:
   image: python:3.10
   stage: build
-  cache:
-    key: backend-deps
-    paths:
-      - backend/venv/
-    policy: pull-push
   script:
     - cd backend/
     - python -m venv venv
@@ -52,11 +47,6 @@ build-backend:
 lint-backend:
   image: python:3.10
   stage: build
-  cache:
-    key: backend-deps
-    paths:
-      - backend/venv/
-    policy: pull-push
   script:
     - cd backend/
     - pip install flake8
@@ -68,11 +58,6 @@ lint-backend:
 test-backend:
   image: python:3.10
   stage: build
-  cache:
-    key: backend-deps
-    paths:
-      - backend/venv/
-    policy: pull-push
   services:
     - postgres
   variables:
@@ -136,11 +121,6 @@ build-frontend:
 lint-frontend:
   image: node:18
   stage: build
-  cache:
-    key: frontend-deps
-    paths:
-      - frontend/node_modules/
-    policy: pull-push
   script:
     - cd frontend/
     - npm install --save-dev eslint eslint-plugin-react eslint-plugin-react-hooks eslint-plugin-jsx-a11y @typescript-eslint/parser @typescript-eslint/eslint-plugin
@@ -151,11 +131,6 @@ lint-frontend:
 test-frontend:
   image: node:18
   stage: build 
-  cache:
-    key: frontend-deps
-    paths:
-      - frontend/node_modules/
-    policy: pull-push
   script:
     - cd frontend/
     - npm install --save-dev @testing-library/jest-dom @testing-library/user-event msw jest-environment-jsdom-sixteen util
