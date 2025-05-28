@@ -29,9 +29,9 @@ stages:
   - test
   - deploy
 
-image: python:3.10
 
 build-backend:
+  image: python:3.10
   stage: build
   script:
     - cd backend/
@@ -44,7 +44,9 @@ build-backend:
       - backend/src/
       - backend/requirements.txt
 
+
 lint-backend:
+  image: python:3.10
   stage: build
   script:
     - cd backend/
@@ -54,7 +56,9 @@ lint-backend:
   needs: 
     - build-backend
 
+
 test-backend:
+  image: python:3.10
   stage: build
   services:
     - postgres
@@ -73,8 +77,9 @@ test-backend:
   needs: 
     - build-backend
 
-image: node:18
+
 build-frontend:
+  image: node:18
   stage: build
   script:
     - cd frontend/
@@ -91,6 +96,7 @@ build-frontend:
 
 
 lint-frontend:
+  image: node:18
   stage: build
   script:
     - cd frontend/
@@ -99,11 +105,13 @@ lint-frontend:
   needs: 
     - build-frontend
 
+
 test-frontend:
+  image: node:18
   stage: build
   script:
     - cd frontend/
-    - npm install --save-dev @testing-library/jest-dom @testing-library/user-event msw
+    - npm install --save-dev @testing-library/jest-dom @testing-library/user-event msw jest-environment-jsdom-sixteen
     - npm test
   needs: 
     - build-frontend
@@ -125,6 +133,7 @@ docker-build-backend:
   needs:
     - lint-backend
     - test-backend
+
 
 trivy-backend:
   stage: test
