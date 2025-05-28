@@ -23,8 +23,8 @@
       container_scanning: $FULL_IMAGE_NAME-scanning-report.json
 
 stages:
-  - config
   - notify
+  - config
   - build
   - test
   - deploy
@@ -72,6 +72,23 @@ test-backend:
     - pytest src/
   needs: 
     - build-backend
+
+build-frontend:
+  image: node:18-alpine
+  stage: build
+  script:
+    - cd frontend/
+    - npm install
+    - npm run build
+  artifacts:
+    paths:
+      - frontend/build/
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - frontend/node_modules/
+    policy: pull-push
+
 
 docker-build-backend:
   stage: build
