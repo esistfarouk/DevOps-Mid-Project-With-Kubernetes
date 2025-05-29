@@ -277,7 +277,7 @@ docker-compose:
   image: docker:latest
   services:
     - docker:dind
-  before_script:    
+  script:    
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
     # to install required secure .pem file
@@ -290,7 +290,6 @@ docker-compose:
     - cat /etc/hosts
     - ssh-keyscan -H $EC2_HOSTNAME >> ~/.ssh/known_hosts
     - ssh -i ~/.ssh/ec2_key.pem ubuntu@$EC2_HOSTNAME
-  script:
     - docker image pull $dockerhub_username/backend:v1
     - docker image pull $dockerhub_username/frontend:v1
     - docker image pull $dockerhub_username/postgres:v1
