@@ -254,9 +254,9 @@ docker-push-images:
     - docker load -i frontend-image.tar
     - docker load -i backend-image.tar
     - docker load -i postgres-image.tar
-    - docker image push ahmedmfarouk/backend:v1
-    - docker image push ahmedmfarouk/frontend:v1
-    - docker image push ahmedmfarouk/postgres:v1
+    - docker image push $dockerhub_username/backend:v1
+    - docker image push $dockerhub_username/frontend:v1
+    - docker image push $dockerhub_username/postgres:v1
   needs:
     - trivy-frontend
     - trivy-backend
