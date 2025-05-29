@@ -48,10 +48,23 @@ slack-notify:
       
 config-deployment-machine:
   stage: config
-  image: ansible
+  before_script:    
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    # - echo "$EC2_SSH_KEY" > ~/.ssh/ec2_key.pem
+    # - chmod 600 ~/.ssh/ec2_key.pem
+    # - echo -e "Host ${EC2_IP}\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile=/dev/null" >> ~/.ssh/config
+    - apt install curl bash -y
+    - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
+    - cp .secure_files/gitlab-test.pem ~/.ssh/ec2_key.pem
+    - chmod 600 ~/.ssh/ec2_key.pem
+    - cat ~/.ssh/ec2_key.pem
+    - echo "$EC2_IP    $EC2_HOSTNAME" |  tee -a /etc/hosts
+    - cat /etc/hosts
+    - apt-get update
+    - apt install ansible-core -y
   script:
-    - echo "$DEPLOYMENT_MACHINE_IP    $DEPLYMEN_MACHINE_HOSTNAME" | sudo tee -a /etc/hosts
-    - ansible-palybook site.yml -i inventory.ini
+    - ansible-playbook site.yml -i inventory.ini
   only:
     - configuration_branch
 
@@ -70,6 +83,8 @@ build-backend:
       - backend/venv/
       - backend/src/
       - backend/requirements.txt
+  only:
+    - main
 
 lint-backend:
   image: python:3.10
@@ -81,6 +96,8 @@ lint-backend:
     - flake8 src/
   needs: 
     - build-backend
+  only:
+    - main
 
 test-backend:
   image: python:3.10
@@ -101,6 +118,8 @@ test-backend:
     - pytest src/
   needs: 
     - build-backend
+  only:
+    - main
 
 docker-build-backend:
   stage: dockerization
@@ -118,6 +137,8 @@ docker-build-backend:
   needs:
     - lint-backend
     - test-backend
+  only:
+    - main
 
 trivy-backend:
   stage: security-scan
@@ -127,6 +148,8 @@ trivy-backend:
     FULL_IMAGE_NAME: backend:v1
   needs:
     - docker-build-backend
+  only:
+    - main
 
 
 build-frontend:
@@ -144,6 +167,8 @@ build-frontend:
     paths:
       - frontend/node_modules/
     policy: pull-push
+  only:
+    - main
 
 lint-frontend:
   image: node:18
@@ -154,6 +179,8 @@ lint-frontend:
     - npm run lint
   needs: 
     - build-frontend
+  only:
+    - main
 
 test-frontend:
   image: node:18
@@ -162,6 +189,8 @@ test-frontend:
     - echo "Testing frontend ... "
   needs: 
     - build-frontend
+  only:
+    - main
 
 docker-build-frontend:
   stage: dockerization
@@ -178,6 +207,8 @@ docker-build-frontend:
   needs:
     - lint-frontend
     - test-frontend
+  only:
+    - main
 
 trivy-frontend:
   stage: security-scan
@@ -187,6 +218,8 @@ trivy-frontend:
     FULL_IMAGE_NAME: frontend:v1
   needs:
     - docker-build-frontend
+  only:
+    - main
 
 
 docker-build-postgres:
@@ -201,6 +234,8 @@ docker-build-postgres:
   artifacts:
     paths:
       - postgres-image.tar
+  only:
+    - main
 
 trivy-postgres:
   stage: security-scan
@@ -210,6 +245,8 @@ trivy-postgres:
     FULL_IMAGE_NAME: postgres:v1
   needs:
     - docker-build-postgres
+  only:
+    - main
 
 docker-compose:
   stage: deploy
@@ -232,3 +269,5 @@ docker-compose:
       artifacts: true
     - job: docker-build-postgres
       artifacts: true
+  only:
+    - main
