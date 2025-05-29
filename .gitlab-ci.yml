@@ -245,8 +245,7 @@ trivy-postgres:
     - main
 
 docker-push-images:
-  #stage: deploy
-  stage: build
+  stage: deploy
   image: docker:latest
   services: 
     - docker:dind
@@ -273,7 +272,8 @@ docker-push-images:
       artifacts: true
 
 docker-compose:
-  stage: deploy
+  #stage: deploy
+  stage: build
   image: docker:latest
   services:
     - docker:dind
