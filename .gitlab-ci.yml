@@ -43,8 +43,6 @@ slack-notify:
         Commit: <'"$CI_PROJECT_URL"'/-/commit/'"$CI_COMMIT_SHA"'|'"${CI_COMMIT_SHA:0:8}"'> - '"$CI_COMMIT_MESSAGE"'\n
         Deployed by '"$GITLAB_USER_NAME"'"
       }' https://hooks.slack.com/services/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
-  only:
-    - main
       
 config-deployment-machine:
   stage: config
@@ -66,7 +64,6 @@ config-deployment-machine:
     - ansible-playbook site.yml -i inventory.ini --private-key=~/.ssh/ec2_key.pem
   only:
     - configuration_branch
-
 
 
 build-backend:
@@ -247,17 +244,19 @@ trivy-postgres:
   only:
     - main
 
-docker-compose:
+docker-push-images:
   stage: deploy
   image: docker:latest
-  services:
+  services: 
     - docker:dind
   script:
+    - docker login -u $dockerhub_username -p $dockerhub_password
     - docker load -i frontend-image.tar
     - docker load -i backend-image.tar
     - docker load -i postgres-image.tar
-    - docker compose down
-    - docker compose up -d
+    - docker image push ahmedmfarouk/backend:v1
+    - docker image push ahmedmfarouk/frontend:v1
+    - docker image push ahmedmfarouk/postgres:v1
   needs:
     - trivy-frontend
     - trivy-backend
@@ -268,5 +267,35 @@ docker-compose:
       artifacts: true
     - job: docker-build-postgres
       artifacts: true
+
+docker-compose:
+  stage: deploy
+  image: docker:latest
+  services:
+    - docker:dind
+  before_script:    
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    # to install required secure .pem file
+    - apt install curl bash -y
+    - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
+    - cp .secure_files/gitlab-test.pem ~/.ssh/ec2_key.pem
+    - chmod 600 ~/.ssh/ec2_key.pem
+    # add ip address to /etc/hosts to change according to EC2_IP variable
+    - echo "$EC2_IP    $EC2_HOSTNAME" |  tee -a /etc/hosts
+    - cat /etc/hosts
+    - ssh-keyscan -H $EC2_HOSTNAME >> ~/.ssh/known_hosts
+    - ssh ubuntu@$EC2_HOSTNAME
+  script:
+    - docker image pull ahmedmfarouk/backend:v1
+    - docker image pull ahmedmfarouk/frontend:v1
+    - docker image pull ahmedmfarouk/postgres:v1
+    - docker tag ahmedmfarouk/backend:v1 backend:v1
+    - docker tag ahmedmfarouk/frontend:v1 frontend:v1
+    - docker tag ahmedmfarouk/postgres:v1 postgres:v1
+    - docker compose down
+    - docker compose up -d
+  needs:
+    - docker-push-images
   only:
     - main
