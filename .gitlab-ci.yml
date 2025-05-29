@@ -280,7 +280,7 @@ docker-compose:
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
     # to install required secure .pem file
-    - apt install curl bash -y
+    - apk add curl bash 
     - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
     - cp .secure_files/gitlab-test.pem ~/.ssh/ec2_key.pem
     - chmod 600 ~/.ssh/ec2_key.pem
