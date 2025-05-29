@@ -245,7 +245,8 @@ trivy-postgres:
     - main
 
 docker-push-images:
-  stage: deploy
+  #stage: deploy
+  stage: build
   image: docker:latest
   services: 
     - docker:dind
@@ -288,7 +289,7 @@ docker-compose:
     - echo "$EC2_IP    $EC2_HOSTNAME" |  tee -a /etc/hosts
     - cat /etc/hosts
     - ssh-keyscan -H $EC2_HOSTNAME >> ~/.ssh/known_hosts
-    - ssh ubuntu@$EC2_HOSTNAME
+    - ssh -i ~/.ssh/ec2_key.pem ubuntu@$EC2_HOSTNAME
   script:
     - docker image pull $dockerhub_username/backend:v1
     - docker image pull $dockerhub_username/frontend:v1
