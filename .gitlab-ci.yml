@@ -254,6 +254,9 @@ docker-push-images:
     - docker load -i frontend-image.tar
     - docker load -i backend-image.tar
     - docker load -i postgres-image.tar
+    - docker tag backend:v1 $dockerhub_username/backend:v1
+    - docker tag frontend:v1 $dockerhub_username/frontend:v1
+    - docker tag postgres:v1 $dockerhub_username/postgres:v1
     - docker image push $dockerhub_username/backend:v1
     - docker image push $dockerhub_username/frontend:v1
     - docker image push $dockerhub_username/postgres:v1
@@ -287,15 +290,15 @@ docker-compose:
     - ssh-keyscan -H $EC2_HOSTNAME >> ~/.ssh/known_hosts
     - ssh ubuntu@$EC2_HOSTNAME
   script:
-    - docker image pull ahmedmfarouk/backend:v1
-    - docker image pull ahmedmfarouk/frontend:v1
-    - docker image pull ahmedmfarouk/postgres:v1
-    - docker tag ahmedmfarouk/backend:v1 backend:v1
-    - docker tag ahmedmfarouk/frontend:v1 frontend:v1
-    - docker tag ahmedmfarouk/postgres:v1 postgres:v1
+    - docker image pull $dockerhub_username/backend:v1
+    - docker image pull $dockerhub_username/frontend:v1
+    - docker image pull $dockerhub_username/postgres:v1
+    - docker tag $dockerhub_username/backend:v1 backend:v1
+    - docker tag $dockerhub_username/frontend:v1 frontend:v1
+    - docker tag $dockerhub_username/postgres:v1 postgres:v1
     - docker compose down
     - docker compose up -d
-  needs:
-    - docker-push-images
+  # needs:
+  #   - docker-push-images
   only:
     - main
