@@ -290,12 +290,14 @@ docker-compose:
     - cat /etc/hosts
     - ssh-keyscan -H $EC2_HOSTNAME >> ~/.ssh/known_hosts
     - ssh -i ~/.ssh/ec2_key.pem ubuntu@$EC2_HOSTNAME
+    - hostnamectl
     - docker image pull $dockerhub_username/backend:v1
     - docker image pull $dockerhub_username/frontend:v1
     - docker image pull $dockerhub_username/postgres:v1
     - docker tag $dockerhub_username/backend:v1 backend:v1
     - docker tag $dockerhub_username/frontend:v1 frontend:v1
     - docker tag $dockerhub_username/postgres:v1 postgres:v1
+    - hostnamectl
     - docker compose down
     - docker compose up -d
   # needs:
