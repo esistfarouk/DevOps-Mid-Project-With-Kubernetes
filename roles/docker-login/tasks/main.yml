@@ -1,4 +1,4 @@
 - name: Log into DockerHub
   community.docker.docker_login:
-    username: '$dockerhub_username'
-    password: 'dockerhub_password'
+    username: "{{lookup('env', '$dockerhub_username')}}"
+    password: "{{lookup('env', 'dockerhub_password')}}"

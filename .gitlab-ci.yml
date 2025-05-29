@@ -51,20 +51,19 @@ config-deployment-machine:
   before_script:    
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
-    # - echo "$EC2_SSH_KEY" > ~/.ssh/ec2_key.pem
-    # - chmod 600 ~/.ssh/ec2_key.pem
-    # - echo -e "Host ${EC2_IP}\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile=/dev/null" >> ~/.ssh/config
+    # to install required secure .pem file
     - apt install curl bash -y
     - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
     - cp .secure_files/gitlab-test.pem ~/.ssh/ec2_key.pem
     - chmod 600 ~/.ssh/ec2_key.pem
-    - cat ~/.ssh/ec2_key.pem
+    # add ip address to /etc/hosts to change according to EC2_IP variable
     - echo "$EC2_IP    $EC2_HOSTNAME" |  tee -a /etc/hosts
     - cat /etc/hosts
+    - ssh-keyscan -H $EC2_HOSTNAME >> ~/.ssh/known_hosts
     - apt-get update
     - apt install ansible-core -y
   script:
-    - ansible-playbook site.yml -i inventory.ini
+    - ansible-playbook site.yml -i inventory.ini --private-key=~/.ssh/ec2_key.pem
   only:
     - configuration_branch
 
