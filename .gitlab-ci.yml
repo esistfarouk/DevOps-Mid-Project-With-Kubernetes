@@ -63,7 +63,7 @@ config-deployment-machine:
   script:
     - ansible-playbook site.yml -i inventory.ini --private-key=~/.ssh/ec2_key.pem
   only:
-    - configuration_branch
+    - config_branch
 
 
 build-backend:
