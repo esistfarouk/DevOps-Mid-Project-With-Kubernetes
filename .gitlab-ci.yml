@@ -308,6 +308,18 @@ docker-compose:
   image: docker:latest
   services:
     - docker:dind  
+  before_script:    
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    # to install required secure .pem file
+    - apk add curl bash 
+    - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
+    - cp .secure_files/gitlab-test.pem ~/.ssh/ec2_key.pem
+    - chmod 600 ~/.ssh/ec2_key.pem
+    # add ip address to /etc/hosts to change according to EC2_IP variable
+    - echo "$EC2_IP    $EC2_HOSTNAME" |  tee -a /etc/hosts
+    - cat /etc/hosts
+    - ssh-keyscan -H $EC2_HOSTNAME >> ~/.ssh/known_hosts
   script:
     - ssh -i ~/.ssh/ec2_key.pem $EC2_USERNAME@$EC2_HOSTNAME "
       export FRONTEND_IMAGE='$FRONTEND_IMAGE';
