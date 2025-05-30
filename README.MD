@@ -1,5 +1,7 @@
 # DevOps Mid-Project Deployment Pipeline
 
+![pipeline diagram](image.png)
+
 ## Config Branch Pipeline
 ![Config Branch Pipeline Diagram](Screeshots/image-3.png)  
 
