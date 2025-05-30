@@ -273,9 +273,8 @@ docker-push-images:
   only:
     - main
 
-docker-compose:
-  stage: notify
-  #stage: deploy
+docker-pull-images:
+  stage: deploy
   image: docker:latest
   services:
     - docker:dind
@@ -299,6 +298,16 @@ docker-compose:
     - ssh -i ~/.ssh/ec2_key.pem $EC2_USERNAME@$EC2_HOSTNAME "docker tag $dockerhub_username/$BACKEND_IMAGE $BACKEND_IMAGE"
     - ssh -i ~/.ssh/ec2_key.pem $EC2_USERNAME@$EC2_HOSTNAME "docker tag $dockerhub_username/$FRONTEND_IMAGE $FRONTEND_IMAGE"
     - ssh -i ~/.ssh/ec2_key.pem $EC2_USERNAME@$EC2_HOSTNAME "docker tag $dockerhub_username/$POSTGRES_IMAGE $POSTGRES_IMAGE"
+  needs:
+    - docker-push-images
+  only:
+    - main
+
+docker-compose:
+  stage: deploy
+  image: docker:latest
+  services:
+    - docker:dind  
     - ssh -i ~/.ssh/ec2_key.pem $EC2_USERNAME@$EC2_HOSTNAME "
       export FRONTEND_IMAGE='$FRONTEND_IMAGE';
       export BACKEND_IMAGE='$BACKEND_IMAGE';
@@ -308,8 +317,9 @@ docker-compose:
       export FRONTEND_IMAGE='$FRONTEND_IMAGE';
       export BACKEND_IMAGE='$BACKEND_IMAGE';
       export POSTGRES_IMAGE='$POSTGRES_IMAGE';
-      docker-compose up"
-  #needs:
-  #  - docker-push-images
+      docker-compose up -d"
+  needs:
+    - docker-pull-images
+  when: manual
   only:
     - main
