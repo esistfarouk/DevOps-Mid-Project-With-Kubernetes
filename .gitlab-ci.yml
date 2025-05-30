@@ -274,7 +274,8 @@ docker-push-images:
     - main
 
 docker-compose:
-  stage: deploy
+  stage: notify
+  #stage: deploy
   image: docker:latest
   services:
     - docker:dind
@@ -300,7 +301,7 @@ docker-compose:
     - ssh -i ~/.ssh/ec2_key.pem $EC2_USERNAME@$EC2_HOSTNAME "docker tag $dockerhub_username/$POSTGRES_IMAGE $POSTGRES_IMAGE"
     - ssh -i ~/.ssh/ec2_key.pem $EC2_USERNAME@$EC2_HOSTNAME "docker-compose down"
     - ssh -i ~/.ssh/ec2_key.pem $EC2_USERNAME@$EC2_HOSTNAME "docker-compose up -d"
-  needs:
-    - docker-push-images
+  #needs:
+  #  - docker-push-images
   only:
     - main
