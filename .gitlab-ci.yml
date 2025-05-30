@@ -244,39 +244,10 @@ trivy-postgres:
   only:
     - main
 
-docker-push-images:
+docker-copy-images:
   stage: deploy
   image: docker:latest
   services: 
-    - docker:dind
-  script:
-    - docker login -u $dockerhub_username -p $dockerhub_password
-    - docker load -i frontend-image.tar
-    - docker load -i backend-image.tar
-    - docker load -i postgres-image.tar
-    - docker tag $BACKEND_IMAGE $dockerhub_username/$BACKEND_IMAGE
-    - docker tag $FRONTEND_IMAGE $dockerhub_username/$FRONTEND_IMAGE
-    - docker tag $POSTGRES_IMAGE $dockerhub_username/$POSTGRES_IMAGE
-    - docker image push $dockerhub_username/$BACKEND_IMAGE
-    - docker image push $dockerhub_username/$FRONTEND_IMAGE
-    - docker image push $dockerhub_username/$POSTGRES_IMAGE
-  needs:
-    - trivy-frontend
-    - trivy-backend
-    - trivy-postgres
-    - job: docker-build-frontend
-      artifacts: true
-    - job: docker-build-backend
-      artifacts: true
-    - job: docker-build-postgres
-      artifacts: true
-  only:
-    - main
-
-docker-pull-images:
-  stage: deploy
-  image: docker:latest
-  services:
     - docker:dind
   before_script:    
     - mkdir -p ~/.ssh
@@ -290,16 +261,24 @@ docker-pull-images:
     - echo "$EC2_IP    $EC2_HOSTNAME" |  tee -a /etc/hosts
     - cat /etc/hosts
     - ssh-keyscan -H $EC2_HOSTNAME >> ~/.ssh/known_hosts
-    - scp -i ~/.ssh/ec2_key.pem docker-compose.yml $EC2_USERNAME@$EC2_HOSTNAME:~/docker-compose.yml
   script:
-    - ssh -i ~/.ssh/ec2_key.pem $EC2_USERNAME@$EC2_HOSTNAME "docker image pull $dockerhub_username/$BACKEND_IMAGE"
-    - ssh -i ~/.ssh/ec2_key.pem $EC2_USERNAME@$EC2_HOSTNAME "docker image pull $dockerhub_username/$FRONTEND_IMAGE"
-    - ssh -i ~/.ssh/ec2_key.pem $EC2_USERNAME@$EC2_HOSTNAME "docker image pull $dockerhub_username/$POSTGRES_IMAGE"
-    - ssh -i ~/.ssh/ec2_key.pem $EC2_USERNAME@$EC2_HOSTNAME "docker tag $dockerhub_username/$BACKEND_IMAGE $BACKEND_IMAGE"
-    - ssh -i ~/.ssh/ec2_key.pem $EC2_USERNAME@$EC2_HOSTNAME "docker tag $dockerhub_username/$FRONTEND_IMAGE $FRONTEND_IMAGE"
-    - ssh -i ~/.ssh/ec2_key.pem $EC2_USERNAME@$EC2_HOSTNAME "docker tag $dockerhub_username/$POSTGRES_IMAGE $POSTGRES_IMAGE"
+    - scp -i ~/.ssh/ec2_key.pem frontend-image.tar $EC2_USERNAME@$EC2_HOSTNAME:~/frontend-image.tar
+    - scp -i ~/.ssh/ec2_key.pem backend-image.tar $EC2_USERNAME@$EC2_HOSTNAME:~/backend-image.tar
+    - scp -i ~/.ssh/ec2_key.pem postgres-image.tar $EC2_USERNAME@$EC2_HOSTNAME:~/postgres-image.tar
+    - scp -i ~/.ssh/ec2_key.pem docker-compose.yml $EC2_USERNAME@$EC2_HOSTNAME:~/docker-compose.yml
+    - ssh -i ~/.ssh/ec2_key.pem $EC2_USERNAME@$EC2_HOSTNAME "docker load -i frontend-image.tar"
+    - ssh -i ~/.ssh/ec2_key.pem $EC2_USERNAME@$EC2_HOSTNAME "docker load -i backend-image.tar"
+    - ssh -i ~/.ssh/ec2_key.pem $EC2_USERNAME@$EC2_HOSTNAME "docker load -i postgres-image.tar"
   needs:
-    - docker-push-images
+    - trivy-frontend
+    - trivy-backend
+    - trivy-postgres
+    - job: docker-build-frontend
+      artifacts: true
+    - job: docker-build-backend
+      artifacts: true
+    - job: docker-build-postgres
+      artifacts: true
   only:
     - main
 
@@ -332,7 +311,7 @@ docker-compose:
       export POSTGRES_IMAGE='$POSTGRES_IMAGE';
       docker-compose up -d"
   needs:
-    - docker-pull-images
+    - docker-copy-images
   when: manual
   only:
     - main
