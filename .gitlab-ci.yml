@@ -124,9 +124,9 @@ docker-build-backend:
     - docker:dind
   script:
     - cd backend/
-    - docker build -t backend:v1 .
+    - docker build -t $BACKEND_IMAGE .
     - cd ..
-    - docker save backend:v1 -o backend-image.tar
+    - docker save $BACKEND_IMAGE -o backend-image.tar
   artifacts:
     paths:
       - backend-image.tar
@@ -141,7 +141,7 @@ trivy-backend:
   extends: .container_scanning
   variables:
     TAR_IMAGE_NAME: backend-image.tar
-    FULL_IMAGE_NAME: backend:v1
+    FULL_IMAGE_NAME: $BACKEND_IMAGE
   needs:
     - docker-build-backend
   only:
@@ -195,8 +195,8 @@ docker-build-frontend:
     - docker:dind
   script:
     - ls frontend/ 
-    - docker build -t frontend:v1 -f frontend/Dockerfile frontend/
-    - docker save frontend:v1 -o frontend-image.tar
+    - docker build -t $FRONTEND_IMAGE -f frontend/Dockerfile frontend/
+    - docker save $FRONTEND_IMAGE -o frontend-image.tar
   artifacts:
     paths:
       - frontend-image.tar
@@ -211,7 +211,7 @@ trivy-frontend:
   extends: .container_scanning
   variables:
     TAR_IMAGE_NAME: frontend-image.tar
-    FULL_IMAGE_NAME: frontend:v1
+    FULL_IMAGE_NAME: $FRONTEND_IMAGE
   needs:
     - docker-build-frontend
   only:
@@ -225,8 +225,8 @@ docker-build-postgres:
     - docker:dind
   script:
     - ls database/ 
-    - docker build -t postgres:v1 -f database/Dockerfile database/
-    - docker save postgres:v1 -o postgres-image.tar
+    - docker build -t $POSTGRES_IMAGE -f database/Dockerfile database/
+    - docker save $POSTGRES_IMAGE -o postgres-image.tar
   artifacts:
     paths:
       - postgres-image.tar
@@ -238,7 +238,7 @@ trivy-postgres:
   extends: .container_scanning
   variables:
     TAR_IMAGE_NAME: postgres-image.tar
-    FULL_IMAGE_NAME: postgres:v1
+    FULL_IMAGE_NAME: $POSTGRES_IMAGE
   needs:
     - docker-build-postgres
   only:
@@ -254,12 +254,12 @@ docker-push-images:
     - docker load -i frontend-image.tar
     - docker load -i backend-image.tar
     - docker load -i postgres-image.tar
-    - docker tag backend:v1 $dockerhub_username/backend:v1
-    - docker tag frontend:v1 $dockerhub_username/frontend:v1
-    - docker tag postgres:v1 $dockerhub_username/postgres:v1
-    - docker image push $dockerhub_username/backend:v1
-    - docker image push $dockerhub_username/frontend:v1
-    - docker image push $dockerhub_username/postgres:v1
+    - docker tag $BACKEND_IMAGE $dockerhub_username/$BACKEND_IMAGE
+    - docker tag $FRONTEND_IMAGE $dockerhub_username/$FRONTEND_IMAGE
+    - docker tag $POSTGRES_IMAGE $dockerhub_username/$POSTGRES_IMAGE
+    - docker image push $dockerhub_username/$BACKEND_IMAGE
+    - docker image push $dockerhub_username/$FRONTEND_IMAGE
+    - docker image push $dockerhub_username/$POSTGRES_IMAGE
   needs:
     - trivy-frontend
     - trivy-backend
@@ -272,8 +272,7 @@ docker-push-images:
       artifacts: true
 
 docker-compose:
-  #stage: deploy
-  stage: build
+  stage: deploy
   image: docker:latest
   services:
     - docker:dind
@@ -289,16 +288,17 @@ docker-compose:
     - echo "$EC2_IP    $EC2_HOSTNAME" |  tee -a /etc/hosts
     - cat /etc/hosts
     - ssh-keyscan -H $EC2_HOSTNAME >> ~/.ssh/known_hosts
-    - ssh -i ~/.ssh/ec2_key.pem ubuntu@$EC2_HOSTNAME
-    - docker image pull $dockerhub_username/backend:v1
-    - docker image pull $dockerhub_username/frontend:v1
-    - docker image pull $dockerhub_username/postgres:v1
-    - docker tag $dockerhub_username/backend:v1 backend:v1
-    - docker tag $dockerhub_username/frontend:v1 frontend:v1
-    - docker tag $dockerhub_username/postgres:v1 postgres:v1
-    - docker compose down
-    - docker compose up -d
-  # needs:
-  #   - docker-push-images
+    - scp -i ~/.ssh/ec2_key.pem docker-compose.yml $EC2_USERNAME@$EC2_HOSTNAME:~/docker-compose.yml
+    - ssh -i ~/.ssh/ec2_key.pem $EC2_USERNAME@$EC2_HOSTNAME
+    - docker image pull $dockerhub_username/$BACKEND_IMAGE
+    - docker image pull $dockerhub_username/$FRONTEND_IMAGE
+    - docker image pull $dockerhub_username/$POSTGRES_IMAGE
+    - docker tag $dockerhub_username/$BACKEND_IMAGE $BACKEND_IMAGE
+    - docker tag $dockerhub_username/$FRONTEND_IMAGE $FRONTEND_IMAGE
+    - docker tag $dockerhub_username/$POSTGRES_IMAGE $POSTGRES_IMAGE
+    - docker-compose down
+    - docker-compose up -d
+  needs:
+    - docker-push-images
   only:
     - main
