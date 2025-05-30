@@ -270,6 +270,8 @@ docker-push-images:
       artifacts: true
     - job: docker-build-postgres
       artifacts: true
+  only:
+    - main
 
 docker-compose:
   stage: deploy
