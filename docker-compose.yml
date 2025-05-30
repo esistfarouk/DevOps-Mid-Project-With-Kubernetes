@@ -3,7 +3,7 @@ version: '3.8'
 services:
   frontend:
     container_name: frontend-app
-    image: "{{lookup('env', '$FRONTEND_IMAGE')}}"
+    image: $FRONTEND_IMAGE
     ports:
       - "8080:80"
     depends_on:
@@ -12,7 +12,7 @@ services:
         
   backend:
     container_name: backend-app
-    image: "{{lookup('env', '$BACKEND_IMAGE')}}"
+    image: $BACKEND_IMAGE
     ports:
       - "5000:5000"
     depends_on:
@@ -22,7 +22,7 @@ services:
   postgres:
     container_name: postgres-container
     #addind directory with dockerfile to fix image vulnerabilities 
-    image: "{{lookup('env', '$POSTGRES_IMAGE')}}"
+    image: $POSTGRES_IMAGE
     #image: postgres:15-alpine
     environment:
       POSTGRES_HOST: postgres
