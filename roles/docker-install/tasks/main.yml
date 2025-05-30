@@ -6,12 +6,14 @@
   ansible.builtin.apt:
     name: docker.io
     state: present
+    update_cache: yes
   become: yes
 
 - name: Install Docker Compose
   ansible.builtin.apt:
     name: docker-compose
     state: present
+    update_cache: yes
   become: yes
 
 
