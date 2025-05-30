@@ -308,7 +308,7 @@ docker-compose:
       export FRONTEND_IMAGE='$FRONTEND_IMAGE';
       export BACKEND_IMAGE='$BACKEND_IMAGE';
       export POSTGRES_IMAGE='$POSTGRES_IMAGE';
-      docker-compose up -d"
+      docker-compose up"
   #needs:
   #  - docker-push-images
   only:
