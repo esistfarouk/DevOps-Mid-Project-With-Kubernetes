@@ -53,11 +53,11 @@ Main Directory/
 ## Security Scanning Results
 
 ### Initial Vulnerability Scan
-1. Frontend Vulnerabilities 
+1. Frontend Vulnerabilities  
 ![frontend vuln](Screeshots/frontend-scan-result-before.png) 
-2. Postgres Vulnerabilities 
+2. Postgres Vulnerabilities  
 ![postgres vuln](Screeshots/database-scan-result-before.png) 
-3. Backend Vulnerabilities 
+3. Backend Vulnerabilities  
 ![backend vuln](Screeshots/backend-scan-result-before.png)
 
 ### Remediation Actions
@@ -66,11 +66,11 @@ Main Directory/
 * Implemented least-privilege user principles
 
 ### Post-Fix Scan Results
-1. Frontend Vulnerabilities Fixed
+1. Frontend Vulnerabilities Fixed  
 ![frontend fixed](Screeshots/frontend-scan-result-after.png) 
-2. Postgres Vulnerabilities 
+2. Postgres Vulnerabilities  
 ![postgresend fixed](Screeshots/database-scan-result-after.png)
-3. Backend Vulnerabilities Fixed 
+3. Backend Vulnerabilities Fixed  
 ![backend fixed](Screeshots/backend-scan-result-after-last546.png) 
 
 **Improvements:**
