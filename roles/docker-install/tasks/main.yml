@@ -8,6 +8,13 @@
     state: present
   become: yes
 
+- name: Install Docker Compose
+  ansible.builtin.apt:
+    name: docker-compose
+    state: present
+  become: yes
+
+
 - name: Ensure group docker exists
   ansible.builtin.group:
     name: docker
