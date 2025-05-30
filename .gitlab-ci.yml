@@ -308,6 +308,7 @@ docker-compose:
   image: docker:latest
   services:
     - docker:dind  
+  script:
     - ssh -i ~/.ssh/ec2_key.pem $EC2_USERNAME@$EC2_HOSTNAME "
       export FRONTEND_IMAGE='$FRONTEND_IMAGE';
       export BACKEND_IMAGE='$BACKEND_IMAGE';
