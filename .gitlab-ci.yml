@@ -278,7 +278,7 @@ docker-compose:
   image: docker:latest
   services:
     - docker:dind
-  script:    
+  before_script:    
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
     # to install required secure .pem file
@@ -291,15 +291,15 @@ docker-compose:
     - cat /etc/hosts
     - ssh-keyscan -H $EC2_HOSTNAME >> ~/.ssh/known_hosts
     - scp -i ~/.ssh/ec2_key.pem docker-compose.yml $EC2_USERNAME@$EC2_HOSTNAME:~/docker-compose.yml
-    - ssh -i ~/.ssh/ec2_key.pem $EC2_USERNAME@$EC2_HOSTNAME
-    - docker image pull $dockerhub_username/$BACKEND_IMAGE
-    - docker image pull $dockerhub_username/$FRONTEND_IMAGE
-    - docker image pull $dockerhub_username/$POSTGRES_IMAGE
-    - docker tag $dockerhub_username/$BACKEND_IMAGE $BACKEND_IMAGE
-    - docker tag $dockerhub_username/$FRONTEND_IMAGE $FRONTEND_IMAGE
-    - docker tag $dockerhub_username/$POSTGRES_IMAGE $POSTGRES_IMAGE
-    - docker-compose down
-    - docker-compose up -d
+  script:
+    - ssh -i ~/.ssh/ec2_key.pem $EC2_USERNAME@$EC2_HOSTNAME "docker image pull $dockerhub_username/$BACKEND_IMAGE"
+    - ssh -i ~/.ssh/ec2_key.pem $EC2_USERNAME@$EC2_HOSTNAME "docker image pull $dockerhub_username/$FRONTEND_IMAGE"
+    - ssh -i ~/.ssh/ec2_key.pem $EC2_USERNAME@$EC2_HOSTNAME "docker image pull $dockerhub_username/$POSTGRES_IMAGE"
+    - ssh -i ~/.ssh/ec2_key.pem $EC2_USERNAME@$EC2_HOSTNAME "docker tag $dockerhub_username/$BACKEND_IMAGE $BACKEND_IMAGE"
+    - ssh -i ~/.ssh/ec2_key.pem $EC2_USERNAME@$EC2_HOSTNAME "docker tag $dockerhub_username/$FRONTEND_IMAGE $FRONTEND_IMAGE"
+    - ssh -i ~/.ssh/ec2_key.pem $EC2_USERNAME@$EC2_HOSTNAME "docker tag $dockerhub_username/$POSTGRES_IMAGE $POSTGRES_IMAGE"
+    - ssh -i ~/.ssh/ec2_key.pem $EC2_USERNAME@$EC2_HOSTNAME "docker-compose down"
+    - ssh -i ~/.ssh/ec2_key.pem $EC2_USERNAME@$EC2_HOSTNAME "docker-compose up -d"
   needs:
     - docker-push-images
   only:
