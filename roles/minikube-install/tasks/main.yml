@@ -1,0 +1,47 @@
+- name: Update apt cache
+  apt:
+    update_cache: yes
+  become: yes
+
+- name: Install required packages
+  apt:
+    name:
+      - curl
+      - wget
+      - apt-transport-https
+      - ca-certificates
+      - gnupg
+      - lsb-release
+    state: present
+  become: yes
+
+- name: Download minikube binary
+  get_url:
+    url: https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+    dest: /usr/local/bin/minikube
+    mode: '0755'
+  become: yes
+
+- name: Start minikube cluster if not running
+  command: minikube start --driver={{ minikube_driver }} --cpus={{ minikube_cpus }} --memory={{ minikube_memory }} --disk-size={{ minikube_disk_size }}
+  become: yes
+  become_user: "{{ ansible_user }}"
+  when: "'Running' not in minikube_status.stdout"
+  async: 300
+  poll: 0
+
+- name: Wait for minikube to be ready
+  command: minikube status
+  register: minikube_ready
+  changed_when: false
+  until: "'Running' in minikube_ready.stdout"
+  retries: 30
+  delay: 10
+  become: yes
+  become_user: "{{ ansible_user }}"
+
+- name: Enable ingress addon
+  command: minikube addons enable ingress
+  become: yes
+  become_user: "{{ ansible_user }}"
+  register: ingress_enable

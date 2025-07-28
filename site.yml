@@ -8,3 +8,17 @@
   roles:
     - docker-login
 
+- name: Installing nginx
+  hosts: deploymentserver
+  roles:
+    - nginx-install
+
+- name: Installing kubectl
+  hosts: deploymentserver
+  roles:
+    - kubectl-install
+
+- name: Installing minikube
+  hosts: deploymentserver
+  roles:
+    - minikube-install

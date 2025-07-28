@@ -1,0 +1,52 @@
+- name: Update apt cache
+  apt:
+    update_cache: yes
+  become: yes
+
+- name: Install nginx
+  apt:
+    name: nginx
+    state: present
+  become: yes
+
+- name: Stop nginx if it's running
+  systemd:
+    name: nginx
+    state: stopped
+
+- name: Create nginx configuration for microservices
+  template:
+    dest: /etc/nginx/sites-available/microservices
+    content: |
+      server {
+          listen 80;
+          server_name {{ server_name }};
+          
+          location / {
+              proxy_pass http://{{ backend_ip }};
+              proxy_set_header Host {{ server_name }};
+              proxy_set_header X-Real-IP $remote_addr;
+              proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+              proxy_set_header X-Forwarded-Proto $scheme;
+          }
+      }
+    mode: '0644'
+    backup: yes
+
+- name: Enable the microservices site
+  file:
+    src: /etc/nginx/sites-available/microservices
+    dest: /etc/nginx/sites-enabled/microservices
+    state: link
+
+- name: Remove default nginx site
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+
+- name: Start and enable nginx service
+  systemd:
+    name: nginx
+    state: started
+    enabled: yes
+  become: yes
