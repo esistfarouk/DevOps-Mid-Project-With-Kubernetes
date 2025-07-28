@@ -244,49 +244,80 @@ trivy-postgres:
   only:
     - main
 
-docker-copy-images:
-  stage: deploy
-  image: docker:latest
-  services: 
-    - docker:dind
-  before_script:    
-    - mkdir -p ~/.ssh
-    - chmod 700 ~/.ssh
-    # to install required secure .pem file
-    - apk add curl bash 
-    - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
-    - cp .secure_files/gitlab-test.pem ~/.ssh/ec2_key.pem
-    - chmod 600 ~/.ssh/ec2_key.pem
-    # add ip address to /etc/hosts to change according to EC2_IP variable
-    - echo "$EC2_IP    $EC2_HOSTNAME" |  tee -a /etc/hosts
-    - cat /etc/hosts
-    - ssh-keyscan -H $EC2_HOSTNAME >> ~/.ssh/known_hosts
-  script:
-    - scp -i ~/.ssh/ec2_key.pem frontend-image.tar $EC2_USERNAME@$EC2_HOSTNAME:~/frontend-image.tar
-    - scp -i ~/.ssh/ec2_key.pem backend-image.tar $EC2_USERNAME@$EC2_HOSTNAME:~/backend-image.tar
-    - scp -i ~/.ssh/ec2_key.pem postgres-image.tar $EC2_USERNAME@$EC2_HOSTNAME:~/postgres-image.tar
-    - scp -i ~/.ssh/ec2_key.pem docker-compose.yml $EC2_USERNAME@$EC2_HOSTNAME:~/docker-compose.yml
-    - ssh -i ~/.ssh/ec2_key.pem $EC2_USERNAME@$EC2_HOSTNAME "docker load -i frontend-image.tar"
-    - ssh -i ~/.ssh/ec2_key.pem $EC2_USERNAME@$EC2_HOSTNAME "docker load -i backend-image.tar"
-    - ssh -i ~/.ssh/ec2_key.pem $EC2_USERNAME@$EC2_HOSTNAME "docker load -i postgres-image.tar"
-  needs:
-    - trivy-frontend
-    - trivy-backend
-    - trivy-postgres
-    - job: docker-build-frontend
-      artifacts: true
-    - job: docker-build-backend
-      artifacts: true
-    - job: docker-build-postgres
-      artifacts: true
-  only:
-    - main
+# docker-copy-images:
+#   stage: deploy
+#   image: docker:latest
+#   services: 
+#     - docker:dind
+#   before_script:    
+#     - mkdir -p ~/.ssh
+#     - chmod 700 ~/.ssh
+#     # to install required secure .pem file
+#     - apk add curl bash 
+#     - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
+#     - cp .secure_files/gitlab-test.pem ~/.ssh/ec2_key.pem
+#     - chmod 600 ~/.ssh/ec2_key.pem
+#     # add ip address to /etc/hosts to change according to EC2_IP variable
+#     - echo "$EC2_IP    $EC2_HOSTNAME" |  tee -a /etc/hosts
+#     - cat /etc/hosts
+#     - ssh-keyscan -H $EC2_HOSTNAME >> ~/.ssh/known_hosts
+#   script:
+#     - scp -i ~/.ssh/ec2_key.pem frontend-image.tar $EC2_USERNAME@$EC2_HOSTNAME:~/frontend-image.tar
+#     - scp -i ~/.ssh/ec2_key.pem backend-image.tar $EC2_USERNAME@$EC2_HOSTNAME:~/backend-image.tar
+#     - scp -i ~/.ssh/ec2_key.pem postgres-image.tar $EC2_USERNAME@$EC2_HOSTNAME:~/postgres-image.tar
+#     - scp -i ~/.ssh/ec2_key.pem docker-compose.yml $EC2_USERNAME@$EC2_HOSTNAME:~/docker-compose.yml
+#     - ssh -i ~/.ssh/ec2_key.pem $EC2_USERNAME@$EC2_HOSTNAME "docker load -i frontend-image.tar"
+#     - ssh -i ~/.ssh/ec2_key.pem $EC2_USERNAME@$EC2_HOSTNAME "docker load -i backend-image.tar"
+#     - ssh -i ~/.ssh/ec2_key.pem $EC2_USERNAME@$EC2_HOSTNAME "docker load -i postgres-image.tar"
+#   needs:
+#     - trivy-frontend
+#     - trivy-backend
+#     - trivy-postgres
+#     - job: docker-build-frontend
+#       artifacts: true
+#     - job: docker-build-backend
+#       artifacts: true
+#     - job: docker-build-postgres
+#       artifacts: true
+#   only:
+#     - main
 
-docker-compose:
+# docker-compose:
+#   stage: deploy
+#   image: docker:latest
+#   services:
+#     - docker:dind  
+#   before_script:    
+#     - mkdir -p ~/.ssh
+#     - chmod 700 ~/.ssh
+#     # to install required secure .pem file
+#     - apk add curl bash 
+#     - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
+#     - cp .secure_files/gitlab-test.pem ~/.ssh/ec2_key.pem
+#     - chmod 600 ~/.ssh/ec2_key.pem
+#     # add ip address to /etc/hosts to change according to EC2_IP variable
+#     - echo "$EC2_IP    $EC2_HOSTNAME" |  tee -a /etc/hosts
+#     - cat /etc/hosts
+#     - ssh-keyscan -H $EC2_HOSTNAME >> ~/.ssh/known_hosts
+#   script:
+#     - ssh -i ~/.ssh/ec2_key.pem $EC2_USERNAME@$EC2_HOSTNAME "
+#       export FRONTEND_IMAGE='$FRONTEND_IMAGE';
+#       export BACKEND_IMAGE='$BACKEND_IMAGE';
+#       export POSTGRES_IMAGE='$POSTGRES_IMAGE';
+#       docker-compose down"
+#     - ssh -i ~/.ssh/ec2_key.pem $EC2_USERNAME@$EC2_HOSTNAME "
+#       export FRONTEND_IMAGE='$FRONTEND_IMAGE';
+#       export BACKEND_IMAGE='$BACKEND_IMAGE';
+#       export POSTGRES_IMAGE='$POSTGRES_IMAGE';
+#       docker-compose up -d"
+#   needs:
+#     - docker-copy-images
+#   when: manual
+#   only:
+#     - main
+
+kubernetes-deploy:
   stage: deploy
-  image: docker:latest
-  services:
-    - docker:dind  
   before_script:    
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
@@ -300,18 +331,19 @@ docker-compose:
     - cat /etc/hosts
     - ssh-keyscan -H $EC2_HOSTNAME >> ~/.ssh/known_hosts
   script:
+    - scp -i ~/.ssh/ec2_key.pem -r kubernetes $EC2_USERNAME@$EC2_HOSTNAME:~/kubernetes
     - ssh -i ~/.ssh/ec2_key.pem $EC2_USERNAME@$EC2_HOSTNAME "
-      export FRONTEND_IMAGE='$FRONTEND_IMAGE';
-      export BACKEND_IMAGE='$BACKEND_IMAGE';
-      export POSTGRES_IMAGE='$POSTGRES_IMAGE';
-      docker-compose down"
-    - ssh -i ~/.ssh/ec2_key.pem $EC2_USERNAME@$EC2_HOSTNAME "
-      export FRONTEND_IMAGE='$FRONTEND_IMAGE';
-      export BACKEND_IMAGE='$BACKEND_IMAGE';
-      export POSTGRES_IMAGE='$POSTGRES_IMAGE';
-      docker-compose up -d"
+      echo "$EC2_IP    microservices.local" |  tee -a /etc/hosts
+      cd kubernetes
+      kubectl delete -f .
+      kubectl apply -f namespace.yml
+      kubectl apply -f .
+      sleep 30
+      kubectl get all -n microservices-app
   needs:
-    - docker-copy-images
+     - trivy-frontend
+     - trivy-backend
+     - trivy-postgres
   when: manual
   only:
     - main
